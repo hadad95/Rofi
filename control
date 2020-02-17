@@ -1,0 +1,9 @@
+Package: com.kef.test
+Name: test
+Depends: mobilesubstrate
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: An awesome MobileSubstrate tweak!
+Maintainer: Kef
+Author: Kef
+Section: Tweaks
