@@ -2,11 +2,34 @@
 #import "SCView.h"
 
 SCView *shortcutView;
+UIStackView *stack;
 
 SBIconView* getIconView(NSString *identifier) {
 	SBIcon *icon = [((SBIconController *)[%c(SBIconController) sharedInstance]).model expectedIconForDisplayIdentifier:identifier];
 	SBIconView *iconView = [[[%c(SBIconController) sharedInstance] homescreenIconViewMap] extraIconViewForIcon:icon];
 	return iconView;
+}
+
+void setupShortcutView() {
+	CGRect bounds = [[UIScreen mainScreen] bounds];
+	CGRect frame = CGRectMake(bounds.size.width, bounds.size.height / 4, 80, bounds.size.height / 2);
+	shortcutView = [[%c(SCView) alloc] initWithFrame:frame];
+	stack = [[UIStackView alloc] init];
+	stack.axis = UILayoutConstraintAxisVertical;
+	stack.distribution = UIStackViewDistributionFillEqually;
+	stack.alignment = UIStackViewAlignmentCenter;
+	stack.spacing = 20;
+
+	SBIconView *iconView = getIconView(@"com.apple.mobilesafari");
+	[stack addArrangedSubview:iconView];
+	[iconView.centerXAnchor constraintEqualToAnchor:stack.centerXAnchor].active = true;
+	//iconView.center = CGPointMake(shortcutView.frame.size.width / 2, iconView.center.y + 10);
+
+	stack.translatesAutoresizingMaskIntoConstraints = false;
+	[shortcutView addSubview:stack];
+
+	[stack.centerXAnchor constraintEqualToAnchor:shortcutView.centerXAnchor].active = true;
+    [stack.centerYAnchor constraintEqualToAnchor:shortcutView.centerYAnchor].active = true;
 }
 
 %hook SpringBoard
@@ -37,12 +60,7 @@ SBIconView* getIconView(NSString *identifier) {
 		return;
 
 	if (shortcutView == nil) {
-		CGRect bounds = [[UIScreen mainScreen] bounds];
-		CGRect frame = CGRectMake(bounds.size.width, bounds.size.height / 4, 80, bounds.size.height / 2);
-		shortcutView = [[%c(SCView) alloc] initWithFrame:frame];
-		SBIconView *iconView = getIconView(@"com.apple.mobilesafari");
-		iconView.center = CGPointMake(shortcutView.frame.size.width / 2, iconView.center.y + 10);
-		[shortcutView addSubview:iconView];
+		setupShortcutView();
 	}
 
 	self.viewIsVisible = YES;
