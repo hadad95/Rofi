@@ -1,5 +1,6 @@
 #import "Tweak.h"
 #import "SCView.h"
+#import "SCViewIconViewController.h"
 
 SCView *shortcutView;
 UIStackView *stack;
@@ -7,6 +8,7 @@ UIStackView *stack;
 SBIconView* getIconView(NSString *identifier) {
 	SBIcon *icon = [((SBIconController *)[%c(SBIconController) sharedInstance]).model expectedIconForDisplayIdentifier:identifier];
 	SBIconView *iconView = [[[%c(SBIconController) sharedInstance] homescreenIconViewMap] extraIconViewForIcon:icon];
+	iconView.delegate = [%c(SCViewIconViewController) sharedInstance];
 	return iconView;
 }
 
@@ -17,9 +19,9 @@ void setupShortcutView() {
 	shortcutView = [[%c(SCView) alloc] initWithFrame:frame];
 	stack = [[UIStackView alloc] init];
 	stack.axis = UILayoutConstraintAxisVertical;
-	stack.distribution = UIStackViewDistributionEqualCentering;
+	stack.distribution = UIStackViewDistributionFillProportionally;
 	stack.alignment = UIStackViewAlignmentCenter;
-	stack.spacing = 20;
+	stack.spacing = 10;
 	stack.backgroundColor = UIColor.redColor;
 
 	SBIconView *iconView = getIconView(@"com.apple.mobilesafari");
@@ -40,17 +42,18 @@ void setupShortcutView() {
     [iconView.widthAnchor constraintEqualToConstant:iconWidth].active = true;
     [iconView.heightAnchor constraintEqualToConstant:iconHeight].active = true;
     NSLog(@"width = %f, height = %f", iconWidth, iconHeight);
-
-
+    
     SBIconView *iconView2 = getIconView(@"com.apple.Preferences");
     [stack addArrangedSubview:iconView2];
     [iconView2.widthAnchor constraintEqualToConstant:iconWidth].active = true;
     [iconView2.heightAnchor constraintEqualToConstant:iconHeight].active = true;
 
+    
     SBIconView *iconView3 = getIconView(@"com.apple.mobileslideshow");
     [stack addArrangedSubview:iconView3];
     [iconView3.widthAnchor constraintEqualToConstant:iconWidth].active = true;
     [iconView3.heightAnchor constraintEqualToConstant:iconHeight].active = true;
+    
 }
 
 %hook SpringBoard

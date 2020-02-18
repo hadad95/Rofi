@@ -7,6 +7,7 @@
 @end
 
 @interface SBIcon
+- (id)applicationBundleID;
 @end
 
 @interface SBIconModel
