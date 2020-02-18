@@ -22,7 +22,8 @@ void setupShortcutView() {
 	stack.distribution = UIStackViewDistributionFillProportionally;
 	stack.alignment = UIStackViewAlignmentCenter;
 	stack.spacing = 10;
-	stack.backgroundColor = UIColor.redColor;
+	stack.layoutMarginsRelativeArrangement = YES;
+	stack.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(10, 0, 10, 0);
 
 	SBIconView *iconView = getIconView(@"com.apple.mobilesafari");
 	CGFloat iconWidth = iconView.frame.size.width;
