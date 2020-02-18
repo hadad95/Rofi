@@ -5,15 +5,15 @@
 SCView *shortcutView;
 UIStackView *shortcutStackView;
 
-SBIconView* getIconView(NSString *identifier) {
+SBIconView* getIconView(NSString *identifier, SBHomeScreenViewController *controller) {
 	SBIcon *icon = [((SBIconController *)[%c(SBIconController) sharedInstance]).model expectedIconForDisplayIdentifier:identifier];
 	SBIconView *iconView = [[[%c(SBIconController) sharedInstance] homescreenIconViewMap] extraIconViewForIcon:icon];
-	iconView.delegate = [%c(SCViewIconViewController) sharedInstance];
+	iconView.delegate = controller; //[%c(SCViewIconViewController) sharedInstance];
 	return iconView;
 }
 
-void addIconViewToStackView(NSString *identifier, UIStackView *stackView) {
-	SBIconView *iconView = getIconView(identifier);
+void addIconViewToStackView(NSString *identifier, UIStackView *stackView, SBHomeScreenViewController *controller) {
+	SBIconView *iconView = getIconView(identifier, controller);
 	CGFloat iconWidth = iconView.frame.size.width;
 	CGFloat iconHeight = iconView.frame.size.height;
 	[stackView addArrangedSubview:iconView];
@@ -21,7 +21,7 @@ void addIconViewToStackView(NSString *identifier, UIStackView *stackView) {
     [iconView.heightAnchor constraintEqualToConstant:iconHeight].active = true;
 }
 
-void setupShortcutView() {
+void setupShortcutView(SBHomeScreenViewController *controller) {
 	CGRect bounds = [[UIScreen mainScreen] bounds];
 	CGRect frame = CGRectMake(bounds.size.width, bounds.size.height / 10, 80, bounds.size.height * 8 / 10);
 	shortcutView = [[%c(SCView) alloc] initWithFrame:frame];
@@ -41,9 +41,9 @@ void setupShortcutView() {
     [shortcutStackView.widthAnchor constraintGreaterThanOrEqualToAnchor:shortcutView.widthAnchor].active = true;
     [shortcutStackView.heightAnchor constraintGreaterThanOrEqualToAnchor:shortcutView.heightAnchor].active = true;
 
-    addIconViewToStackView(@"com.apple.mobilesafari", shortcutStackView);
-    addIconViewToStackView(@"com.apple.Preferences", shortcutStackView);
-    addIconViewToStackView(@"com.apple.mobileslideshow", shortcutStackView);
+    addIconViewToStackView(@"com.apple.mobilesafari", shortcutStackView, controller);
+    addIconViewToStackView(@"com.apple.Preferences", shortcutStackView, controller);
+    addIconViewToStackView(@"com.apple.mobileslideshow", shortcutStackView, controller);
 }
 
 %hook SpringBoard
@@ -74,7 +74,7 @@ void setupShortcutView() {
 		return;
 
 	if (shortcutView == nil) {
-		setupShortcutView();
+		setupShortcutView(self);
 	}
 
 	self.viewIsVisible = YES;
@@ -104,5 +104,12 @@ void setupShortcutView() {
 		} completion:^ (BOOL finished) {
 			[shortcutView removeFromSuperview];
 		}];
+}
+
+%new
+-(void)iconTapped:(id)arg1 {
+	[self hideView];
+	NSString *bundleID = [((SBIconView *)arg1).icon applicationBundleID];
+	[[UIApplication sharedApplication] launchApplicationWithIdentifier:bundleID suspended:NO];
 }
 %end

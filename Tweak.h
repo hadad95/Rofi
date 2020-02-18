@@ -1,5 +1,10 @@
-@interface SBHomeScreenViewController : UIViewController
+#import "SBIconViewDelegate.h"
+
+@interface SBHomeScreenViewController : UIViewController <SBIconViewDelegate>
 @property (nonatomic, assign) BOOL viewIsVisible;
+- (void)showView;
+- (void)hideView;
+- (void)iconTapped:(id)arg1;
 @end
 
 @interface SpringBoard
