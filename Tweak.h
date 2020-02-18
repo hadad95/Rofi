@@ -47,3 +47,7 @@
 @interface SBApplicationIcon : SBIcon
 - (id)initWithApplication:(id)arg1;
 @end
+
+@interface UIApplication (Private)
+- (BOOL)launchApplicationWithIdentifier:(id)arg1 suspended:(BOOL)arg2;
+@end

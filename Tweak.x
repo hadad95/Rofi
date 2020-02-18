@@ -1,6 +1,5 @@
 #import "Tweak.h"
 #import "SCView.h"
-#import "SCViewIconViewController.h"
 
 SCView *shortcutView;
 UIStackView *shortcutStackView;
