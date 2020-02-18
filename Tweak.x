@@ -14,7 +14,7 @@ SBIconView* getIconView(NSString *identifier) {
 
 void setupShortcutView() {
 	CGRect bounds = [[UIScreen mainScreen] bounds];
-	CGRect frame = CGRectMake(bounds.size.width, bounds.size.height / 4, 80, bounds.size.height / 2);
+	CGRect frame = CGRectMake(bounds.size.width, bounds.size.height / 10, 80, bounds.size.height * 8 / 10);
 	//CGRect stackFrame = CGRectMake(0, 0, 80, bounds.size.height / 2);
 	shortcutView = [[%c(SCView) alloc] initWithFrame:frame];
 	stack = [[UIStackView alloc] init];
