@@ -3,7 +3,6 @@
 @implementation SCView
 - (id)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
-	NSLog(@"self = %@", self);
 	if (self) {
 		self.backgroundColor = UIColor.grayColor;
 		CAShapeLayer * maskLayer = [CAShapeLayer layer];

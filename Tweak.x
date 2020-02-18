@@ -13,33 +13,54 @@ SBIconView* getIconView(NSString *identifier) {
 void setupShortcutView() {
 	CGRect bounds = [[UIScreen mainScreen] bounds];
 	CGRect frame = CGRectMake(bounds.size.width, bounds.size.height / 4, 80, bounds.size.height / 2);
+	//CGRect stackFrame = CGRectMake(0, 0, 80, bounds.size.height / 2);
 	shortcutView = [[%c(SCView) alloc] initWithFrame:frame];
 	stack = [[UIStackView alloc] init];
 	stack.axis = UILayoutConstraintAxisVertical;
-	stack.distribution = UIStackViewDistributionFillEqually;
+	stack.distribution = UIStackViewDistributionEqualCentering;
 	stack.alignment = UIStackViewAlignmentCenter;
 	stack.spacing = 20;
+	stack.backgroundColor = UIColor.redColor;
 
 	SBIconView *iconView = getIconView(@"com.apple.mobilesafari");
-	[stack addArrangedSubview:iconView];
-	[iconView.centerXAnchor constraintEqualToAnchor:stack.centerXAnchor].active = true;
-	//iconView.center = CGPointMake(shortcutView.frame.size.width / 2, iconView.center.y + 10);
+	CGFloat iconWidth = iconView.frame.size.width;
+	CGFloat iconHeight = iconView.frame.size.height;
+	NSLog(@"iconView.frame = %@", NSStringFromCGRect(iconView.frame));
 
 	stack.translatesAutoresizingMaskIntoConstraints = false;
 	[shortcutView addSubview:stack];
 
 	[stack.centerXAnchor constraintEqualToAnchor:shortcutView.centerXAnchor].active = true;
     [stack.centerYAnchor constraintEqualToAnchor:shortcutView.centerYAnchor].active = true;
+    //[stack.leadingAnchor constraintEqualToAnchor:shortcutView.leadingAnchor].active = true;
+    [stack.widthAnchor constraintGreaterThanOrEqualToAnchor:shortcutView.widthAnchor].active = true;
+    [stack.heightAnchor constraintGreaterThanOrEqualToAnchor:shortcutView.heightAnchor].active = true;
+
+    [stack addArrangedSubview:iconView];
+    [iconView.widthAnchor constraintEqualToConstant:iconWidth].active = true;
+    [iconView.heightAnchor constraintEqualToConstant:iconHeight].active = true;
+    NSLog(@"width = %f, height = %f", iconWidth, iconHeight);
+
+
+    SBIconView *iconView2 = getIconView(@"com.apple.Preferences");
+    [stack addArrangedSubview:iconView2];
+    [iconView2.widthAnchor constraintEqualToConstant:iconWidth].active = true;
+    [iconView2.heightAnchor constraintEqualToConstant:iconHeight].active = true;
+
+    SBIconView *iconView3 = getIconView(@"com.apple.mobileslideshow");
+    [stack addArrangedSubview:iconView3];
+    [iconView3.widthAnchor constraintEqualToConstant:iconWidth].active = true;
+    [iconView3.heightAnchor constraintEqualToConstant:iconHeight].active = true;
 }
 
 %hook SpringBoard
 - (BOOL)_handlePhysicalButtonEvent:(UIPressesEvent *)arg1 {
 	UIPress *press = arg1.allPresses.anyObject;
 	if (press.type == 102 && press.force == 1) {
-		[[NSNotificationCenter defaultCenter] postNotificationName:@"com.kef.test.showview" object:nil];
+		[[NSNotificationCenter defaultCenter] postNotificationName:@"com.kef.test/showview" object:nil];
 	}
 	else if (press.type == 103 && press.force == 1) {
-		[[NSNotificationCenter defaultCenter] postNotificationName:@"com.kef.test.hideview" object:nil];
+		[[NSNotificationCenter defaultCenter] postNotificationName:@"com.kef.test/hideview" object:nil];
 	}
 	return %orig;
 }
@@ -50,8 +71,8 @@ void setupShortcutView() {
 
 - (void)viewDidLoad {
 	%orig;
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showView) name:@"com.kef.test.showview" object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideView) name:@"com.kef.test.hideview" object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showView) name:@"com.kef.test/showview" object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideView) name:@"com.kef.test/hideview" object:nil];
 }
 
 %new
