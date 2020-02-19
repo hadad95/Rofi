@@ -3,11 +3,12 @@
 
 SCView *shortcutView;
 UIStackView *shortcutStackView;
+UIScrollView *shortcutScrollView;
 
 SBIconView* getIconView(NSString *identifier, SBHomeScreenViewController *controller) {
 	SBIcon *icon = [((SBIconController *)[%c(SBIconController) sharedInstance]).model expectedIconForDisplayIdentifier:identifier];
 	SBIconView *iconView = [[[%c(SBIconController) sharedInstance] homescreenIconViewMap] extraIconViewForIcon:icon];
-	iconView.delegate = controller; //[%c(SCViewIconViewController) sharedInstance];
+	iconView.delegate = controller;
 	return iconView;
 }
 
@@ -22,27 +23,39 @@ void addIconViewToStackView(NSString *identifier, UIStackView *stackView, SBHome
 
 void setupShortcutView(SBHomeScreenViewController *controller) {
 	CGRect bounds = [[UIScreen mainScreen] bounds];
-	CGRect frame = CGRectMake(bounds.size.width, bounds.size.height / 10, 80, bounds.size.height * 8 / 10);
+	CGRect frame = CGRectMake(bounds.size.width, bounds.size.height / 4, 80, bounds.size.height / 2);
 	shortcutView = [[%c(SCView) alloc] initWithFrame:frame];
+	shortcutScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 80, bounds.size.height / 2)];
+	shortcutScrollView.translatesAutoresizingMaskIntoConstraints = false;
+	shortcutScrollView.showsVerticalScrollIndicator = NO;
+
 	shortcutStackView = [[UIStackView alloc] init];
 	shortcutStackView.axis = UILayoutConstraintAxisVertical;
 	shortcutStackView.distribution = UIStackViewDistributionFillProportionally;
 	shortcutStackView.alignment = UIStackViewAlignmentCenter;
-	shortcutStackView.spacing = 10;
+	shortcutStackView.spacing = 20;
 	shortcutStackView.layoutMarginsRelativeArrangement = YES;
-	shortcutStackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(10, 0, 10, 0);
+	shortcutStackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(10, 0, 20, 0);
 
 	shortcutStackView.translatesAutoresizingMaskIntoConstraints = false;
-	[shortcutView addSubview:shortcutStackView];
+	[shortcutScrollView addSubview:shortcutStackView];
+	[shortcutView addSubview:shortcutScrollView];
 
-	[shortcutStackView.centerXAnchor constraintEqualToAnchor:shortcutView.centerXAnchor].active = true;
-    [shortcutStackView.centerYAnchor constraintEqualToAnchor:shortcutView.centerYAnchor].active = true;
-    [shortcutStackView.widthAnchor constraintGreaterThanOrEqualToAnchor:shortcutView.widthAnchor].active = true;
-    [shortcutStackView.heightAnchor constraintGreaterThanOrEqualToAnchor:shortcutView.heightAnchor].active = true;
+	[shortcutScrollView.leadingAnchor constraintEqualToAnchor:shortcutView.leadingAnchor].active = true;
+    [shortcutScrollView.trailingAnchor constraintEqualToAnchor:shortcutView.trailingAnchor].active = true;
+    [shortcutScrollView.topAnchor constraintEqualToAnchor:shortcutView.topAnchor].active = true;
+    [shortcutScrollView.bottomAnchor constraintEqualToAnchor:shortcutView.bottomAnchor].active = true;
+
+    [shortcutStackView.centerXAnchor constraintEqualToAnchor:shortcutScrollView.centerXAnchor].active = true;
+    //[shortcutStackView.trailingAnchor constraintEqualToAnchor:shortcutScrollView.trailingAnchor].active = true;
+    [shortcutStackView.topAnchor constraintEqualToAnchor:shortcutScrollView.topAnchor].active = true;
+    [shortcutStackView.bottomAnchor constraintEqualToAnchor:shortcutScrollView.bottomAnchor].active = true;
 
     addIconViewToStackView(@"com.apple.mobilesafari", shortcutStackView, controller);
     addIconViewToStackView(@"com.apple.Preferences", shortcutStackView, controller);
     addIconViewToStackView(@"com.apple.mobileslideshow", shortcutStackView, controller);
+    addIconViewToStackView(@"com.apple.Maps", shortcutStackView, controller);
+    addIconViewToStackView(@"com.hammerandchisel.discord", shortcutStackView, controller);
 }
 
 %hook SpringBoard
@@ -77,6 +90,7 @@ void setupShortcutView(SBHomeScreenViewController *controller) {
 	}
 
 	self.viewIsVisible = YES;
+	[shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
 	[self.view addSubview:shortcutView];
 	CGRect frame = shortcutView.frame;
 	[UIView animateWithDuration:0.25
