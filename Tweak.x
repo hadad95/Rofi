@@ -32,6 +32,8 @@ void setupShortcutView(SBHomeScreenViewController *controller) {
 
 	blurView = [[UIVisualEffectView alloc] initWithEffect:nil];
 	blurView.frame = controller.view.bounds;
+	UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:controller action:@selector(blurViewTapped:)];
+	[blurView addGestureRecognizer:tapRecognizer];
 
 	shortcutStackView = [[UIStackView alloc] init];
 	shortcutStackView.axis = UILayoutConstraintAxisVertical;
@@ -119,7 +121,6 @@ void setupShortcutView(SBHomeScreenViewController *controller) {
 		return;
 
 	self.viewIsVisible = NO;
-	NSLog(@"self.shortcutView = %@", shortcutView);
 	CGRect frame = shortcutView.frame;
 	[UIView animateWithDuration:0.25
 		delay:0.0
@@ -143,5 +144,10 @@ void setupShortcutView(SBHomeScreenViewController *controller) {
 	[self hideView];
 	NSString *bundleID = [((SBIconView *)arg1).icon applicationBundleID];
 	[[UIApplication sharedApplication] launchApplicationWithIdentifier:bundleID suspended:NO];
+}
+
+%new
+-(void)blurViewTapped:(id)arg1 {
+	[self hideView];
 }
 %end
