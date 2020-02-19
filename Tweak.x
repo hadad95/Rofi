@@ -4,6 +4,7 @@
 SCView *shortcutView;
 UIStackView *shortcutStackView;
 UIScrollView *shortcutScrollView;
+UIVisualEffectView *blurView;
 
 SBIconView* getIconView(NSString *identifier, SBHomeScreenViewController *controller) {
 	SBIcon *icon = [((SBIconController *)[%c(SBIconController) sharedInstance]).model expectedIconForDisplayIdentifier:identifier];
@@ -29,6 +30,9 @@ void setupShortcutView(SBHomeScreenViewController *controller) {
 	shortcutScrollView.translatesAutoresizingMaskIntoConstraints = false;
 	shortcutScrollView.showsVerticalScrollIndicator = NO;
 
+	blurView = [[UIVisualEffectView alloc] initWithEffect:nil];
+	blurView.frame = controller.view.bounds;
+
 	shortcutStackView = [[UIStackView alloc] init];
 	shortcutStackView.axis = UILayoutConstraintAxisVertical;
 	shortcutStackView.distribution = UIStackViewDistributionFillProportionally;
@@ -40,6 +44,7 @@ void setupShortcutView(SBHomeScreenViewController *controller) {
 	shortcutStackView.translatesAutoresizingMaskIntoConstraints = false;
 	[shortcutScrollView addSubview:shortcutStackView];
 	[shortcutView addSubview:shortcutScrollView];
+	//[blurView addSubview:shortcutView];
 
 	[shortcutScrollView.leadingAnchor constraintEqualToAnchor:shortcutView.leadingAnchor].active = true;
     [shortcutScrollView.trailingAnchor constraintEqualToAnchor:shortcutView.trailingAnchor].active = true;
@@ -91,8 +96,15 @@ void setupShortcutView(SBHomeScreenViewController *controller) {
 
 	self.viewIsVisible = YES;
 	[shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
+	[self.view addSubview:blurView];
 	[self.view addSubview:shortcutView];
 	CGRect frame = shortcutView.frame;
+	[UIView animateWithDuration:0.25
+		delay:0.0
+		options:UIViewAnimationOptionCurveEaseOut
+		animations: ^ {
+			blurView.effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+		} completion:nil];
 	[UIView animateWithDuration:0.25
 		delay:0.0
 		options:UIViewAnimationOptionCurveEaseOut
@@ -113,9 +125,16 @@ void setupShortcutView(SBHomeScreenViewController *controller) {
 		delay:0.0
 		options:UIViewAnimationOptionCurveEaseIn
 		animations:^ {
+			blurView.effect = nil;
+		} completion:nil];
+	[UIView animateWithDuration:0.25
+		delay:0.0
+		options:UIViewAnimationOptionCurveEaseIn
+		animations:^ {
 			shortcutView.frame = CGRectMake(frame.origin.x + 80, frame.origin.y, frame.size.width, frame.size.height);
 		} completion:^ (BOOL finished) {
 			[shortcutView removeFromSuperview];
+			[blurView removeFromSuperview];
 		}];
 }
 
