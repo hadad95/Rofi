@@ -9,6 +9,7 @@
 
 @interface SpringBoard
 - (BOOL)_handlePhysicalButtonEvent:(UIPressesEvent *)arg1;
+- (void)applicationDidFinishLaunching:(id)application;
 @end
 
 @interface SBIcon
