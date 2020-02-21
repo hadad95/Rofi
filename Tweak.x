@@ -7,6 +7,7 @@
 @end
 
 static SCWindow *window;
+static SCViewController *viewController;
 static UIScreenEdgePanGestureRecognizer *pan;
 
 %subclass SCWindow : UIWindow
@@ -22,6 +23,7 @@ static UIScreenEdgePanGestureRecognizer *pan;
 %hook SpringBoard
 - (BOOL)_handlePhysicalButtonEvent:(UIPressesEvent *)arg1 {
 	UIPress *press = arg1.allPresses.anyObject;
+	/*
 	if (press.type == 102 && press.force == 1) {
 		NSLog(@"Posting notification: showview");
 		[[NSNotificationCenter defaultCenter] postNotificationName:@"com.kef.test/showview" object:nil];
@@ -30,14 +32,20 @@ static UIScreenEdgePanGestureRecognizer *pan;
 		NSLog(@"Posting notification: hideview");
 		[[NSNotificationCenter defaultCenter] postNotificationName:@"com.kef.test/hideview" object:nil];
 	}
+	*/
+	if (press.type == 101 && press.force == 1 && viewController.isViewVisible) {
+		[viewController hideView];
+		return NO;
+	}
 	return %orig;
 }
 
 - (void)applicationDidFinishLaunching:(id)application {
 	%orig;
+	viewController = [SCViewController new];
 	window = [[%c(SCWindow) alloc] initWithFrame:UIScreen.mainScreen.bounds];
 	window.screen = UIScreen.mainScreen;
-	window.rootViewController = [SCViewController new];
+	window.rootViewController = viewController;
 	window.userInteractionEnabled = YES;
 	window.opaque = NO;
 	window.hidden = NO;

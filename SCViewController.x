@@ -26,9 +26,12 @@
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	
+
+	/*	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showView) name:@"com.kef.test/showview" object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideView) name:@"com.kef.test/hideview" object:nil];
+	*/
+	
 	[UIApplication.sharedApplication performSelector:@selector(addActiveOrientationObserver:) withObject:self];
 
 	CGRect bounds = [[UIScreen mainScreen] bounds];
@@ -89,17 +92,17 @@
     CGFloat width = self.shortcutView.frame.size.width;
     CGFloat percent = MAX(-[gesture translationInView:gesture.view ].x, 0)/width;
     if (gesture.state == UIGestureRecognizerStateEnded) {
-    	if (percent >= 0.5)
+    	if (percent >= 0.25)
     		[self showView];
     }
 }
 
 - (void)showView {
 	NSLog(@"showView called");
-	if (self.viewIsVisible)
+	if (self.isViewVisible)
 		return;
 
-	self.viewIsVisible = YES;
+	self.isViewVisible = YES;
 	[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
 	[self.view addSubview:self.blurView];
 	[self.view addSubview:self.shortcutView];
@@ -120,10 +123,10 @@
 
 - (void)hideView {
 	NSLog(@"hideView called");
-	if (!self.viewIsVisible)
+	if (!self.isViewVisible)
 		return;
 
-	self.viewIsVisible = NO;
+	self.isViewVisible = NO;
 	CGRect frame = self.shortcutView.frame;
 	[UIView animateWithDuration:0.25
 		delay:0.0
