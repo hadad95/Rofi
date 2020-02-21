@@ -32,7 +32,7 @@
 	[UIApplication.sharedApplication performSelector:@selector(addActiveOrientationObserver:) withObject:self];
 
 	CGRect bounds = [[UIScreen mainScreen] bounds];
-	CGFloat ratio = 0.8;
+	CGFloat ratio = 0.5;
 	CGRect frame = CGRectMake(bounds.size.width, bounds.size.height * (1 - ratio) / 2, 80, bounds.size.height * ratio);
 	self.shortcutView = [((SCView *)[%c(SCView) alloc]) initWithFrame:frame];
 	self.shortcutScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 80, bounds.size.height / 2)];
@@ -70,12 +70,6 @@
     [self addIconViewToStackView:@"com.apple.mobileslideshow"];
     [self addIconViewToStackView:@"com.apple.Maps"];
     [self addIconViewToStackView:@"com.hammerandchisel.discord"];
-    /*
-    UIScreenEdgePanGestureRecognizer *pan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan)];
-	[pan setEdges:UIRectEdgeRight];
-	[pan setDelegate:self];
-	[self.view addGestureRecognizer:pan];
-	*/
 }
 
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture {
@@ -146,5 +140,9 @@
 -(void)blurViewTapped:(id)arg1 {
 	[self hideView];
 }
+
+- (void)activeInterfaceOrientationDidChangeToOrientation:(long long)arg1 willAnimateWithDuration:(double)arg2 fromOrientation:(long long)arg3 {}
+
+- (void)activeInterfaceOrientationWillChangeToOrientation:(long long)arg1 {}
 
 @end

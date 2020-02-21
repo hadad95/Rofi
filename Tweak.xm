@@ -43,10 +43,11 @@ static UIScreenEdgePanGestureRecognizer *pan;
 	window.hidden = NO;
 	window.backgroundColor = [UIColor clearColor];
 	window.windowLevel = UIWindowLevelAlert + 1;
+	
 	pan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:window.rootViewController action:@selector(handlePan:)];
 	[pan setEdges:UIRectEdgeRight];
 	[pan setDelegate:(SCViewController *)window.rootViewController];
-	//[window.rootViewController.view addGestureRecognizer:pan];
+	[window.rootViewController.view addGestureRecognizer:pan];
 	SBSystemGestureManager *gestureManager = [%c(SBSystemGestureManager) mainDisplayManager];
 	FBSDisplayIdentity *dispIdentity = MSHookIvar<FBSDisplayIdentity *>(gestureManager, "_displayIdentity");
 	[[%c(FBSystemGestureManager) sharedInstance] addGestureRecognizer:pan toDisplayWithIdentity:dispIdentity];

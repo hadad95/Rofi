@@ -2,7 +2,12 @@
 #import "SBIconViewDelegate.h"
 #import "Tweak.h"
 
-@interface SCViewController : UIViewController <SBIconViewDelegate, UIGestureRecognizerDelegate>
+@protocol SBUIActiveOrientationObserver <NSObject>
+- (void)activeInterfaceOrientationDidChangeToOrientation:(long long)arg1 willAnimateWithDuration:(double)arg2 fromOrientation:(long long)arg3;
+- (void)activeInterfaceOrientationWillChangeToOrientation:(long long)arg1;
+@end
+
+@interface SCViewController : UIViewController <SBIconViewDelegate, UIGestureRecognizerDelegate, SBUIActiveOrientationObserver>
 @property (nonatomic, assign) BOOL viewIsVisible;
 @property (nonatomic, retain) SCView *shortcutView;
 @property (nonatomic, retain) UIStackView *shortcutStackView;
