@@ -1,5 +1,17 @@
 #import "SBIconViewDelegate.h"
 
+@interface FBSystemGestureManager : NSObject <UIGestureRecognizerDelegate>
++ (id)sharedInstance;
+- (void)addGestureRecognizer:(id)arg1 toDisplayWithIdentity:(id)arg2;
+@end
+
+@interface SBSystemGestureManager : NSObject
++ (id)mainDisplayManager;
+@end
+
+@interface FBSDisplayIdentity : NSObject
+@end
+
 @interface SBHomeScreenViewController : UIViewController <SBIconViewDelegate>
 @property (nonatomic, assign) BOOL viewIsVisible;
 - (void)showView;

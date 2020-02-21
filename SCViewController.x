@@ -32,7 +32,8 @@
 	[UIApplication.sharedApplication performSelector:@selector(addActiveOrientationObserver:) withObject:self];
 
 	CGRect bounds = [[UIScreen mainScreen] bounds];
-	CGRect frame = CGRectMake(bounds.size.width, bounds.size.height / 4, 80, bounds.size.height / 2);
+	CGFloat ratio = 0.8;
+	CGRect frame = CGRectMake(bounds.size.width, bounds.size.height * (1 - ratio) / 2, 80, bounds.size.height * ratio);
 	self.shortcutView = [((SCView *)[%c(SCView) alloc]) initWithFrame:frame];
 	self.shortcutScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 80, bounds.size.height / 2)];
 	self.shortcutScrollView.translatesAutoresizingMaskIntoConstraints = false;
@@ -49,7 +50,7 @@
 	self.shortcutStackView.alignment = UIStackViewAlignmentCenter;
 	self.shortcutStackView.spacing = 20;
 	self.shortcutStackView.layoutMarginsRelativeArrangement = YES;
-	self.shortcutStackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(10, 0, 20, 0);
+	self.shortcutStackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(0, 0, 20, 0);
 
 	self.shortcutStackView.translatesAutoresizingMaskIntoConstraints = false;
 	[self.shortcutScrollView addSubview:self.shortcutStackView];
@@ -77,18 +78,21 @@
 	*/
 }
 
-- (void)handlePan {
-	NSLog(@"handlePan called");
+- (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture {
+	NSLog(@"handlePan called. gesture.state = %ld", gesture.state);
+	//CGPoint translation =  [gesture translationInView:gesture.view];
+    CGFloat width = self.shortcutView.frame.size.width;
+    CGFloat percent = MAX(-[gesture translationInView:gesture.view ].x, 0)/width;
+    if (gesture.state == UIGestureRecognizerStateEnded) {
+    	if (percent >= 0.5)
+    		[self showView];
+    }
 }
 
 - (void)showView {
 	NSLog(@"showView called");
 	if (self.viewIsVisible)
 		return;
-
-	if (self.shortcutView == nil) {
-		//setupShortcutView(self);
-	}
 
 	self.viewIsVisible = YES;
 	[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
@@ -99,7 +103,7 @@
 		delay:0.0
 		options:UIViewAnimationOptionCurveEaseOut
 		animations: ^ {
-			self.blurView.effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+			self.blurView.effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
 		} completion:nil];
 	[UIView animateWithDuration:0.25
 		delay:0.0

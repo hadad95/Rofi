@@ -10,7 +10,7 @@
 @property (nonatomic, retain) UIVisualEffectView *blurView;
 - (SBIconView *)getIconView:(NSString *)identifier;
 - (void)addIconViewToStackView:(NSString *)identifier;
-- (void)handlePan;
+- (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture;
 - (void)showView;
 - (void)hideView;
 - (void)iconTapped:(id)arg1;
