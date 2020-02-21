@@ -31,11 +31,11 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showView) name:@"com.kef.test/showview" object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideView) name:@"com.kef.test/hideview" object:nil];
 	*/
-	
+
 	[UIApplication.sharedApplication performSelector:@selector(addActiveOrientationObserver:) withObject:self];
 
 	CGRect bounds = [[UIScreen mainScreen] bounds];
-	CGFloat ratio = 0.5;
+	CGFloat ratio = 0.7;
 	CGRect frame = CGRectMake(bounds.size.width, bounds.size.height * (1 - ratio) / 2, 80, bounds.size.height * ratio);
 	self.shortcutView = [((SCView *)[%c(SCView) alloc]) initWithFrame:frame];
 	self.shortcutScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 80, bounds.size.height / 2)];
@@ -88,7 +88,9 @@
 }
 
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture {
-	NSLog(@"handlePan called. gesture.state = %ld", gesture.state);
+	if ([(SpringBoard *)UIApplication.sharedApplication isLocked])
+		return;
+
     CGFloat width = self.shortcutView.frame.size.width;
     CGFloat percent = MAX(-[gesture translationInView:gesture.view ].x, 0)/width;
     if (gesture.state == UIGestureRecognizerStateEnded) {
@@ -98,7 +100,6 @@
 }
 
 - (void)showView {
-	NSLog(@"showView called");
 	if (self.isViewVisible)
 		return;
 
@@ -122,7 +123,6 @@
 }
 
 - (void)hideView {
-	NSLog(@"hideView called");
 	if (!self.isViewVisible)
 		return;
 
