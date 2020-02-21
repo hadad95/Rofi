@@ -50,7 +50,7 @@
 	self.shortcutStackView.alignment = UIStackViewAlignmentCenter;
 	self.shortcutStackView.spacing = 20;
 	self.shortcutStackView.layoutMarginsRelativeArrangement = YES;
-	self.shortcutStackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(0, 0, 20, 0);
+	self.shortcutStackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(10, 0, 20, 0);
 
 	self.shortcutStackView.translatesAutoresizingMaskIntoConstraints = false;
 	[self.shortcutScrollView addSubview:self.shortcutStackView];
@@ -65,16 +65,27 @@
     [self.shortcutStackView.topAnchor constraintEqualToAnchor:self.shortcutScrollView.topAnchor].active = true;
     [self.shortcutStackView.bottomAnchor constraintEqualToAnchor:self.shortcutScrollView.bottomAnchor].active = true;
 
-    [self addIconViewToStackView:@"com.apple.mobilesafari"];
-    [self addIconViewToStackView:@"com.apple.Preferences"];
-    [self addIconViewToStackView:@"com.apple.mobileslideshow"];
-    [self addIconViewToStackView:@"com.apple.Maps"];
+    [self addIconViewToStackView:@"com.facebook.Facebook"];
     [self addIconViewToStackView:@"com.hammerandchisel.discord"];
+    [self addIconViewToStackView:@"net.whatsapp.WhatsApp"];
+    [self addIconViewToStackView:@"com.facebook.Messenger"];
+    [self addIconViewToStackView:@"com.burbn.instagram"];
+
+    UIView *barView = [[UIView alloc] initWithFrame:CGRectMake(bounds.size.width - 10, 375 - 25, 10, 100)];
+    barView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.5];
+    CAShapeLayer * maskLayer = [CAShapeLayer layer];
+	maskLayer.path = [UIBezierPath bezierPathWithRoundedRect: barView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii: (CGSize){10.0, 10.0}].CGPath;
+	barView.layer.mask = maskLayer;
+    [self.view addSubview:barView];
+
+    UIScreenEdgePanGestureRecognizer *pan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+    [pan setEdges:UIRectEdgeRight];
+	[pan setDelegate:self];
+	[barView addGestureRecognizer:pan];
 }
 
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture {
 	NSLog(@"handlePan called. gesture.state = %ld", gesture.state);
-	//CGPoint translation =  [gesture translationInView:gesture.view];
     CGFloat width = self.shortcutView.frame.size.width;
     CGFloat percent = MAX(-[gesture translationInView:gesture.view ].x, 0)/width;
     if (gesture.state == UIGestureRecognizerStateEnded) {
