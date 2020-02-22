@@ -13,6 +13,7 @@
 @property (nonatomic, retain) UIStackView *shortcutStackView;
 @property (nonatomic, retain) UIScrollView *shortcutScrollView;
 @property (nonatomic, retain) UIVisualEffectView *blurView;
+@property (nonatomic, retain) UIView *barView;
 - (SBIconView *)getIconView:(NSString *)identifier;
 - (void)addIconViewToStackView:(NSString *)identifier;
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture;

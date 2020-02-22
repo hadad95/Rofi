@@ -4,6 +4,8 @@
 
 #define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 
+CGPoint longPressStartingPoint;
+
 @implementation SCViewController
 
 - (BOOL)shouldAutorotate {
@@ -12,20 +14,33 @@
 
 - (SBIconView*)getIconView:(NSString *)identifier {
 	SBIcon *icon = [((SBIconController *)[%c(SBIconController) sharedInstance]).model expectedIconForDisplayIdentifier:identifier];
+	if (icon == nil)
+		return nil;
+
 	SBIconView *iconView;
 	if (SYSTEM_VERSION_LESS_THAN(@"13")) {
-		iconView = [[((SBIconController *)[%c(SBIconController) sharedInstance]) homescreenIconViewMap] extraIconViewForIcon:icon];
+		//iconView = [[((SBIconController *)[%c(SBIconController) sharedInstance]) homescreenIconViewMap] extraIconViewForIcon:icon];
+		iconView = [[%c(SBIconView) alloc] initWithContentType:0];
 	}
 	else {
-		iconView = [[((SBIconController *)[%c(SBIconController) sharedInstance]) iconManager] firstIconViewForIcon:icon];
+		/*
+		NSLog(@"[SC] SBIcon = %@", icon);
+		iconView = [[((SBIconController *)[%c(SBIconController) sharedInstance]) iconManager] iconViewForIcon:icon location:@"SBIconLocationRoot"];
+		NSLog(@"[SC] iconView = %@", iconView);
+		*/
+		iconView = [[%c(SBIconView) alloc] initWithConfigurationOptions:0];
 	}
-	NSLog(@"iconView = %@", iconView);
+	iconView.icon = icon;
 	iconView.delegate = self;
+	NSLog(@"iconView = %@", iconView);
 	return iconView;
 }
 
 - (void)addIconViewToStackView:(NSString *)identifier {
 	SBIconView *iconView = [self getIconView:identifier];
+	if (iconView == nil)
+		return;
+
 	CGFloat iconWidth = iconView.frame.size.width;
 	CGFloat iconHeight = iconView.frame.size.height;
 	[self.shortcutStackView addArrangedSubview:iconView];
@@ -92,20 +107,25 @@
     [self addIconViewToStackView:@"com.burbn.instagram"];
     [self addIconViewToStackView:@"com.toyopagroup.picaboo"];
 
-    UIView *barView = [[UIView alloc] initWithFrame:CGRectMake(bounds.size.width - 10, 375 - 25, 10, 100)];
-    barView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.5];
+    self.barView = [[UIView alloc] initWithFrame:CGRectMake(bounds.size.width - 10, 100, 10, 100)];
+    self.barView.backgroundColor = [UIColor colorWithRed:0.6 green:0.67 blue:0.71 alpha:0.5];
     CAShapeLayer * maskLayer = [CAShapeLayer layer];
-	maskLayer.path = [UIBezierPath bezierPathWithRoundedRect: barView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii: (CGSize){10.0, 10.0}].CGPath;
-	barView.layer.mask = maskLayer;
-    [self.view addSubview:barView];
+	maskLayer.path = [UIBezierPath bezierPathWithRoundedRect: self.barView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii: (CGSize){10.0, 10.0}].CGPath;
+	self.barView.layer.mask = maskLayer;
+    [self.view addSubview:self.barView];
 
     UIScreenEdgePanGestureRecognizer *pan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
     [pan setEdges:UIRectEdgeRight];
 	[pan setDelegate:self];
-	[barView addGestureRecognizer:pan];
+	[self.barView addGestureRecognizer:pan];
+
+	UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+	longPress.minimumPressDuration = 0.5;
+	[self.barView addGestureRecognizer:longPress];
 }
 
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture {
+	NSLog(@"handlePan called");
 	if ([(SpringBoard *)UIApplication.sharedApplication isLocked])
 		return;
 
@@ -115,6 +135,40 @@
     	if (percent >= 0.25)
     		[self showView];
     }
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
+	CGPoint point = [gesture locationInView:self.view];
+	NSLog(@"point = %@", NSStringFromCGPoint(point));
+	switch (gesture.state) {
+		case UIGestureRecognizerStateBegan:
+		{
+			[UIView animateWithDuration:0.25
+				animations:^ {
+					self.barView.backgroundColor = [self.barView.backgroundColor colorWithAlphaComponent:1];
+				}];
+			break;
+		}
+		case UIGestureRecognizerStateChanged:
+		{
+			CGPoint center = self.barView.center;
+			center.y += point.y - longPressStartingPoint.y;
+			self.barView.center = center;
+			break;
+		}
+		case UIGestureRecognizerStateEnded:
+		{
+			[UIView animateWithDuration:0.25
+				animations:^ {
+					self.barView.backgroundColor = [self.barView.backgroundColor colorWithAlphaComponent:0.5];
+				}];
+			break;
+		}
+		default:
+			break;
+	}
+
+	longPressStartingPoint = point;
 }
 
 - (void)showView {

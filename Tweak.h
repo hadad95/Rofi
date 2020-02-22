@@ -41,20 +41,23 @@
 // ios 13 stuff
 @interface SBHIconManager : NSObject
 - (id)firstIconViewForIcon:(id)arg1;
+- (void)configureIconView:(id)arg1 forIcon:(id)arg2;
 - (id)iconViewForIcon:(id)arg1 location:(id)arg2;
+- (id)iconViewMap;
 @end
 
 @interface SBIconController : UIViewController
 @property(retain, nonatomic) SBIconModel *model;
 @property(readonly, nonatomic) SBIconViewMap *homescreenIconViewMap;
 + (SBIconController *)sharedInstance;
--(SBHIconManager *)iconManager; // ios 13
+- (SBHIconManager *)iconManager; // ios 13
 @end
 
 @interface SBIconView : UIView
-- (id)initWithContentType:(NSUInteger)arg1;
 @property(retain, nonatomic) SBIcon *icon;
 @property(nonatomic) __weak id delegate;
+- (id)initWithContentType:(NSUInteger)arg1; // ios 12
+- (id)initWithConfigurationOptions:(NSUInteger)arg1; // ios 13
 @end
 
 @interface SBApplication
