@@ -2,6 +2,8 @@
 #import "SCView.h"
 #import "Tweak.h"
 
+#define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
+
 @implementation SCViewController
 
 - (BOOL)shouldAutorotate {
@@ -10,7 +12,14 @@
 
 - (SBIconView*)getIconView:(NSString *)identifier {
 	SBIcon *icon = [((SBIconController *)[%c(SBIconController) sharedInstance]).model expectedIconForDisplayIdentifier:identifier];
-	SBIconView *iconView = [[((SBIconController *)[%c(SBIconController) sharedInstance]) homescreenIconViewMap] extraIconViewForIcon:icon];
+	SBIconView *iconView;
+	if (SYSTEM_VERSION_LESS_THAN(@"13")) {
+		iconView = [[((SBIconController *)[%c(SBIconController) sharedInstance]) homescreenIconViewMap] extraIconViewForIcon:icon];
+	}
+	else {
+		iconView = [[((SBIconController *)[%c(SBIconController) sharedInstance]) iconManager] firstIconViewForIcon:icon];
+	}
+	NSLog(@"iconView = %@", iconView);
 	iconView.delegate = self;
 	return iconView;
 }
@@ -32,7 +41,7 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideView) name:@"com.kef.test/hideview" object:nil];
 	*/
 
-	[UIApplication.sharedApplication performSelector:@selector(addActiveOrientationObserver:) withObject:self];
+	//[UIApplication.sharedApplication performSelector:@selector(addActiveOrientationObserver:) withObject:self];
 
 	CGRect bounds = [[UIScreen mainScreen] bounds];
 	CGFloat ratio = 0.7;
@@ -68,11 +77,20 @@
     [self.shortcutStackView.topAnchor constraintEqualToAnchor:self.shortcutScrollView.topAnchor].active = true;
     [self.shortcutStackView.bottomAnchor constraintEqualToAnchor:self.shortcutScrollView.bottomAnchor].active = true;
 
+    /*
     [self addIconViewToStackView:@"com.facebook.Facebook"];
     [self addIconViewToStackView:@"com.hammerandchisel.discord"];
     [self addIconViewToStackView:@"net.whatsapp.WhatsApp"];
     [self addIconViewToStackView:@"com.facebook.Messenger"];
     [self addIconViewToStackView:@"com.burbn.instagram"];
+    */
+
+    [self addIconViewToStackView:@"com.hammerandchisel.discord"];
+    [self addIconViewToStackView:@"com.atebits.Tweetie2"];
+    [self addIconViewToStackView:@"com.apple.mobilesafari"];
+    [self addIconViewToStackView:@"net.whatsapp.WhatsApp"];
+    [self addIconViewToStackView:@"com.burbn.instagram"];
+    [self addIconViewToStackView:@"com.toyopagroup.picaboo"];
 
     UIView *barView = [[UIView alloc] initWithFrame:CGRectMake(bounds.size.width - 10, 375 - 25, 10, 100)];
     barView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.5];
@@ -154,9 +172,9 @@
 -(void)blurViewTapped:(id)arg1 {
 	[self hideView];
 }
-
+/*
 - (void)activeInterfaceOrientationDidChangeToOrientation:(long long)arg1 willAnimateWithDuration:(double)arg2 fromOrientation:(long long)arg3 {}
 
 - (void)activeInterfaceOrientationWillChangeToOrientation:(long long)arg1 {}
-
+*/
 @end

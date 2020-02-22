@@ -7,7 +7,7 @@
 - (void)activeInterfaceOrientationWillChangeToOrientation:(long long)arg1;
 @end
 
-@interface SCViewController : UIViewController <SBIconViewDelegate, UIGestureRecognizerDelegate, SBUIActiveOrientationObserver>
+@interface SCViewController : UIViewController <SBIconViewDelegate, UIGestureRecognizerDelegate>//, SBUIActiveOrientationObserver>
 @property (nonatomic, assign) BOOL isViewVisible;
 @property (nonatomic, retain) SCView *shortcutView;
 @property (nonatomic, retain) UIStackView *shortcutStackView;

@@ -38,10 +38,17 @@
 - (id)extraIconViewForIcon:(id)arg1;
 @end
 
+// ios 13 stuff
+@interface SBHIconManager : NSObject
+- (id)firstIconViewForIcon:(id)arg1;
+- (id)iconViewForIcon:(id)arg1 location:(id)arg2;
+@end
+
 @interface SBIconController : UIViewController
-+ (SBIconController *)sharedInstance;
 @property(retain, nonatomic) SBIconModel *model;
 @property(readonly, nonatomic) SBIconViewMap *homescreenIconViewMap;
++ (SBIconController *)sharedInstance;
+-(SBHIconManager *)iconManager; // ios 13
 @end
 
 @interface SBIconView : UIView
