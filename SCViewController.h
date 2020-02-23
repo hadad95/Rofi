@@ -10,6 +10,7 @@
 @interface SCViewController : UIViewController <SBIconViewDelegate, UIGestureRecognizerDelegate>//, SBUIActiveOrientationObserver>
 @property (nonatomic, assign) BOOL isViewVisible;
 @property (nonatomic, assign) BOOL isRightDirection;
+@property (nonatomic, assign) BOOL isDraggingShortcutView;
 @property (nonatomic, retain) SCView *shortcutView;
 @property (nonatomic, retain) UIStackView *shortcutStackView;
 @property (nonatomic, retain) UIScrollView *shortcutScrollView;

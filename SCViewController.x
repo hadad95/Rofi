@@ -134,9 +134,42 @@ CGPoint longPressStartingPoint;
     CGFloat width = self.shortcutView.frame.size.width;
     // TODO: change the shit out of this
     CGFloat percent = MAX(pow(-1, (int)self.isRightDirection) * [gesture translationInView:gesture.view ].x, 0)/width;
-    if (gesture.state == UIGestureRecognizerStateEnded) {
+    if (gesture.state == UIGestureRecognizerStateBegan)
+    	self.isDraggingShortcutView = YES;
+    else if (gesture.state == UIGestureRecognizerStateChanged) {
+    	if (self.shortcutView.superview == nil)
+    		[self.view addSubview:self.shortcutView];
+
+    	CGRect bounds = UIScreen.mainScreen.bounds;
+    	CGPoint location = [gesture locationInView:self.view];
+    	CGPoint center = self.shortcutView.center;
+    	NSLog(@"location = %@", NSStringFromCGPoint(location));
+    	NSLog(@"shortcutView.frame.origin = %@", NSStringFromCGPoint(self.shortcutView.frame.origin));
+    	if ((self.isRightDirection && (bounds.size.width - location.x) > width) || (!self.isRightDirection && location.x > width)) { // display full view
+			if (self.isRightDirection) {
+				center.x = bounds.size.width - (self.shortcutView.frame.size.width / 2);
+			}
+			else {
+				center.x = self.shortcutView.frame.size.width / 2;
+			}
+    	}
+    	else {
+    		if (self.isRightDirection) {
+    			center.x = location.x + (width / 2);
+    		}
+    		else {
+    			center.x = location.x - (width / 2) ;
+    		}
+    	}
+    	self.shortcutView.center = center;
+    }
+    else if (gesture.state == UIGestureRecognizerStateEnded) {
     	if (percent >= 0.25)
     		[self showView];
+    	else {
+    		NSLog(@"percent < 0.25");
+    		[self hideView];
+    	}
     }
 }
 
@@ -212,13 +245,20 @@ CGPoint longPressStartingPoint;
 }
 
 - (void)showView {
-	if (self.isViewVisible)
+	if (self.isViewVisible && !self.isDraggingShortcutView)
 		return;
 
 	self.isViewVisible = YES;
+	self.isDraggingShortcutView = NO;
 	[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
-	[self.view addSubview:self.blurView];
-	[self.view addSubview:self.shortcutView];
+	if (self.shortcutView.superview == nil) {
+		[self.view addSubview:self.blurView];
+		[self.view addSubview:self.shortcutView];
+	}
+	else {
+		if (self.blurView.superview == nil)
+			[self.view insertSubview:self.blurView belowSubview:self.shortcutView];
+	}
 	CGRect bounds = UIScreen.mainScreen.bounds;
 	CGPoint center = self.shortcutView.center;
 	if (self.isRightDirection) {
@@ -242,10 +282,11 @@ CGPoint longPressStartingPoint;
 }
 
 - (void)hideView {
-	if (!self.isViewVisible)
+	if (!self.isViewVisible && !self.isDraggingShortcutView)
 		return;
 
 	self.isViewVisible = NO;
+	self.isDraggingShortcutView = NO;
 	CGRect bounds = UIScreen.mainScreen.bounds;
 	CGPoint center = self.shortcutView.center;
 	if (self.isRightDirection) {
@@ -254,21 +295,26 @@ CGPoint longPressStartingPoint;
 	else {
 		center.x = -1 * self.shortcutView.frame.size.width / 2;
 	}
-	[UIView animateWithDuration:0.25
-		delay:0.0
-		options:UIViewAnimationOptionCurveEaseIn
-		animations:^ {
-			self.blurView.effect = nil;
-		} completion:nil];
-	[UIView animateWithDuration:0.25
-		delay:0.0
-		options:UIViewAnimationOptionCurveEaseIn
-		animations:^ {
-			self.shortcutView.center = center;
-		} completion:^ (BOOL finished) {
-			[self.shortcutView removeFromSuperview];
-			[self.blurView removeFromSuperview];
-		}];
+	if (self.blurView.superview != nil) {
+		[UIView animateWithDuration:0.25
+			delay:0.0
+			options:UIViewAnimationOptionCurveEaseIn
+			animations:^ {
+				self.blurView.effect = nil;
+			} completion:nil];
+	}
+	if (self.shortcutView.superview != nil) {
+		[UIView animateWithDuration:0.25
+			delay:0.0
+			options:UIViewAnimationOptionCurveEaseIn
+			animations:^ {
+				self.shortcutView.center = center;
+			} completion:^ (BOOL finished) {
+				[self.shortcutView removeFromSuperview];
+				if (self.blurView.superview != nil)
+					[self.blurView removeFromSuperview];
+			}];
+	}
 }
 
 -(void)iconTapped:(id)arg1 {
