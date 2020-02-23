@@ -21,6 +21,7 @@ CGPoint longPressStartingPoint;
 	if (SYSTEM_VERSION_LESS_THAN(@"13")) {
 		//iconView = [[((SBIconController *)[%c(SBIconController) sharedInstance]) homescreenIconViewMap] extraIconViewForIcon:icon];
 		iconView = [[%c(SBIconView) alloc] initWithContentType:0];
+		iconView.delegate = (SBIconController *)[%c(SBIconController) sharedInstance];
 	}
 	else {
 		/*
@@ -29,10 +30,10 @@ CGPoint longPressStartingPoint;
 		NSLog(@"[SC] iconView = %@", iconView);
 		*/
 		iconView = [[%c(SBIconView) alloc] initWithConfigurationOptions:0];
+		iconView.delegate = [((SBIconController *)[%c(SBIconController) sharedInstance]) iconManager];
 	}
 	iconView.icon = icon;
-	iconView.delegate = self;
-	NSLog(@"iconView = %@", iconView);
+	//iconView.delegate = self;
 	return iconView;
 }
 
@@ -57,6 +58,8 @@ CGPoint longPressStartingPoint;
 	*/
 
 	//[UIApplication.sharedApplication performSelector:@selector(addActiveOrientationObserver:) withObject:self];
+
+	self.isRightDirection = YES;
 
 	CGRect bounds = [[UIScreen mainScreen] bounds];
 	CGFloat ratio = 0.7;
@@ -109,15 +112,15 @@ CGPoint longPressStartingPoint;
 
     self.barView = [[UIView alloc] initWithFrame:CGRectMake(bounds.size.width - 10, 100, 10, 100)];
     self.barView.backgroundColor = [UIColor colorWithRed:0.6 green:0.67 blue:0.71 alpha:0.5];
-    CAShapeLayer * maskLayer = [CAShapeLayer layer];
+    CAShapeLayer *maskLayer = [CAShapeLayer layer];
 	maskLayer.path = [UIBezierPath bezierPathWithRoundedRect: self.barView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii: (CGSize){10.0, 10.0}].CGPath;
 	self.barView.layer.mask = maskLayer;
     [self.view addSubview:self.barView];
 
-    UIScreenEdgePanGestureRecognizer *pan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-    [pan setEdges:UIRectEdgeRight];
-	[pan setDelegate:self];
-	[self.barView addGestureRecognizer:pan];
+    self.edgePan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+    self.edgePan.edges = UIRectEdgeRight;
+	self.edgePan.delegate = self;
+	[self.barView addGestureRecognizer:self.edgePan];
 
 	UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
 	longPress.minimumPressDuration = 0.5;
@@ -125,12 +128,12 @@ CGPoint longPressStartingPoint;
 }
 
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture {
-	NSLog(@"handlePan called");
 	if ([(SpringBoard *)UIApplication.sharedApplication isLocked])
 		return;
 
     CGFloat width = self.shortcutView.frame.size.width;
-    CGFloat percent = MAX(-[gesture translationInView:gesture.view ].x, 0)/width;
+    // TODO: change the shit out of this
+    CGFloat percent = MAX(pow(-1, (int)self.isRightDirection) * [gesture translationInView:gesture.view ].x, 0)/width;
     if (gesture.state == UIGestureRecognizerStateEnded) {
     	if (percent >= 0.25)
     		[self showView];
@@ -139,7 +142,6 @@ CGPoint longPressStartingPoint;
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
 	CGPoint point = [gesture locationInView:self.view];
-	NSLog(@"point = %@", NSStringFromCGPoint(point));
 	switch (gesture.state) {
 		case UIGestureRecognizerStateBegan:
 		{
@@ -151,13 +153,51 @@ CGPoint longPressStartingPoint;
 		}
 		case UIGestureRecognizerStateChanged:
 		{
-			CGPoint center = self.barView.center;
-			center.y += point.y - longPressStartingPoint.y;
-			self.barView.center = center;
+			CGPoint barCenter = self.barView.center;
+			barCenter.y += point.y - longPressStartingPoint.y;
+			CGRect bounds = UIScreen.mainScreen.bounds;
+			if (point.x >= bounds.size.width / 2 && !self.isRightDirection) { // moving to the right
+				barCenter.x = bounds.size.width - (self.barView.frame.size.width / 2);
+				CAShapeLayer * maskLayer1 = [CAShapeLayer layer];
+				maskLayer1.path = [UIBezierPath bezierPathWithRoundedRect: self.barView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii: (CGSize){10.0, 10.0}].CGPath;
+				self.barView.layer.mask = maskLayer1;
+				CAShapeLayer * maskLayer2 = [CAShapeLayer layer];
+				maskLayer2.path = [UIBezierPath bezierPathWithRoundedRect: self.shortcutView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii: (CGSize){10.0, 10.0}].CGPath;
+				self.shortcutView.layer.mask = maskLayer2;
+				self.isRightDirection = YES;
+				CGPoint shortcutViewCenter = self.shortcutView.center;
+				if (!self.isViewVisible) {
+					shortcutViewCenter.x = bounds.size.width + (self.shortcutView.frame.size.width / 2);
+				}
+				else {
+					shortcutViewCenter.x = bounds.size.width - (self.shortcutView.frame.size.width / 2);
+				}
+				self.shortcutView.center = shortcutViewCenter;
+			}
+			else if (point.x < bounds.size.width / 2 && self.isRightDirection) { // moving to the left
+				barCenter.x = self.barView.frame.size.width / 2;
+				CAShapeLayer *maskLayer1 = [CAShapeLayer layer];
+				maskLayer1.path = [UIBezierPath bezierPathWithRoundedRect: self.barView.bounds byRoundingCorners: UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii: (CGSize){10.0, 10.0}].CGPath;
+				self.barView.layer.mask = maskLayer1;
+				CAShapeLayer * maskLayer2 = [CAShapeLayer layer];
+				maskLayer2.path = [UIBezierPath bezierPathWithRoundedRect: self.shortcutView.bounds byRoundingCorners: UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii: (CGSize){10.0, 10.0}].CGPath;
+				self.shortcutView.layer.mask = maskLayer2;
+				self.isRightDirection = NO;
+				CGPoint shortcutViewCenter = self.shortcutView.center;
+				if (!self.isViewVisible) {
+					shortcutViewCenter.x = -1 * self.shortcutView.frame.size.width / 2;
+				}
+				else {
+					shortcutViewCenter.x = self.shortcutView.frame.size.width / 2;
+				}
+				self.shortcutView.center = shortcutViewCenter;
+			}
+			self.barView.center = barCenter;
 			break;
 		}
 		case UIGestureRecognizerStateEnded:
 		{
+			self.edgePan.edges = self.isRightDirection ? UIRectEdgeRight : UIRectEdgeLeft;
 			[UIView animateWithDuration:0.25
 				animations:^ {
 					self.barView.backgroundColor = [self.barView.backgroundColor colorWithAlphaComponent:0.5];
@@ -179,7 +219,14 @@ CGPoint longPressStartingPoint;
 	[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
 	[self.view addSubview:self.blurView];
 	[self.view addSubview:self.shortcutView];
-	CGRect frame = self.shortcutView.frame;
+	CGRect bounds = UIScreen.mainScreen.bounds;
+	CGPoint center = self.shortcutView.center;
+	if (self.isRightDirection) {
+		center.x = bounds.size.width - (self.shortcutView.frame.size.width / 2);
+	}
+	else {
+		center.x = self.shortcutView.frame.size.width / 2;
+	}
 	[UIView animateWithDuration:0.25
 		delay:0.0
 		options:UIViewAnimationOptionCurveEaseOut
@@ -190,7 +237,7 @@ CGPoint longPressStartingPoint;
 		delay:0.0
 		options:UIViewAnimationOptionCurveEaseOut
 		animations:^ {
-			self.shortcutView.frame = CGRectMake(frame.origin.x - 80, frame.origin.y, frame.size.width, frame.size.height);
+			self.shortcutView.center = center;
 		} completion:nil];
 }
 
@@ -199,7 +246,14 @@ CGPoint longPressStartingPoint;
 		return;
 
 	self.isViewVisible = NO;
-	CGRect frame = self.shortcutView.frame;
+	CGRect bounds = UIScreen.mainScreen.bounds;
+	CGPoint center = self.shortcutView.center;
+	if (self.isRightDirection) {
+		center.x = bounds.size.width + (self.shortcutView.frame.size.width / 2);
+	}
+	else {
+		center.x = -1 * self.shortcutView.frame.size.width / 2;
+	}
 	[UIView animateWithDuration:0.25
 		delay:0.0
 		options:UIViewAnimationOptionCurveEaseIn
@@ -210,7 +264,7 @@ CGPoint longPressStartingPoint;
 		delay:0.0
 		options:UIViewAnimationOptionCurveEaseIn
 		animations:^ {
-			self.shortcutView.frame = CGRectMake(frame.origin.x + 80, frame.origin.y, frame.size.width, frame.size.height);
+			self.shortcutView.center = center;
 		} completion:^ (BOOL finished) {
 			[self.shortcutView removeFromSuperview];
 			[self.blurView removeFromSuperview];
