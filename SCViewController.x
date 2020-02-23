@@ -21,7 +21,7 @@ CGPoint longPressStartingPoint;
 	if (SYSTEM_VERSION_LESS_THAN(@"13")) {
 		//iconView = [[((SBIconController *)[%c(SBIconController) sharedInstance]) homescreenIconViewMap] extraIconViewForIcon:icon];
 		iconView = [[%c(SBIconView) alloc] initWithContentType:0];
-		iconView.delegate = (SBIconController *)[%c(SBIconController) sharedInstance];
+		//iconView.delegate = (SBIconController *)[%c(SBIconController) sharedInstance];
 	}
 	else {
 		/*
@@ -30,10 +30,10 @@ CGPoint longPressStartingPoint;
 		NSLog(@"[SC] iconView = %@", iconView);
 		*/
 		iconView = [[%c(SBIconView) alloc] initWithConfigurationOptions:0];
-		iconView.delegate = [((SBIconController *)[%c(SBIconController) sharedInstance]) iconManager];
+		//iconView.delegate = [((SBIconController *)[%c(SBIconController) sharedInstance]) iconManager];
 	}
 	iconView.icon = icon;
-	//iconView.delegate = self;
+	iconView.delegate = self;
 	return iconView;
 }
 
