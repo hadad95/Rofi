@@ -20,8 +20,12 @@
 - (SBIconView *)getIconView:(NSString *)identifier;
 - (void)addIconViewToStackView:(NSString *)identifier;
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture;
+- (UIViewPropertyAnimator *)showingViewPropertyAnimator;
+- (UIViewPropertyAnimator *)hidingViewPropertyAnimator;
 - (void)showView;
 - (void)hideView;
+- (void)showViewWithPropertyAnimator:(UIViewPropertyAnimator *)animator;
+- (void)hideViewWithPropertyAnimator:(UIViewPropertyAnimator *)animator;
 - (void)iconTapped:(id)arg1;
--(void)blurViewTapped:(id)arg1;
+- (void)blurViewTapped:(id)arg1;
 @end
