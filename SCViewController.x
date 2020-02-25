@@ -61,6 +61,7 @@ UIViewPropertyAnimator *panAnimator;
 	//[UIApplication.sharedApplication performSelector:@selector(addActiveOrientationObserver:) withObject:self];
 
 	self.isRightDirection = YES;
+	self.barViewCornerRadiusSize = (CGSize){10, 10};
 
 	CGRect bounds = [[UIScreen mainScreen] bounds];
 	CGFloat ratio = 0.7;
@@ -111,10 +112,10 @@ UIViewPropertyAnimator *panAnimator;
     [self addIconViewToStackView:@"com.burbn.instagram"];
     [self addIconViewToStackView:@"com.toyopagroup.picaboo"];
 
-    self.barView = [[UIView alloc] initWithFrame:CGRectMake(bounds.size.width - 10, 100, 10, 100)];
+    self.barView = [[UIView alloc] initWithFrame:CGRectMake(bounds.size.width - 5, 100, 5, 100)];
     self.barView.backgroundColor = [UIColor colorWithRed:0.6 green:0.67 blue:0.71 alpha:0.5];
     CAShapeLayer *maskLayer = [CAShapeLayer layer];
-	maskLayer.path = [UIBezierPath bezierPathWithRoundedRect: self.barView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii: (CGSize){10.0, 10.0}].CGPath;
+	maskLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.barView.bounds byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:self.barViewCornerRadiusSize].CGPath;
 	self.barView.layer.mask = maskLayer;
     [self.view addSubview:self.barView];
 
@@ -178,7 +179,7 @@ UIViewPropertyAnimator *panAnimator;
 			if (point.x >= bounds.size.width / 2 && !self.isRightDirection) { // moving to the right
 				barCenter.x = bounds.size.width - (self.barView.frame.size.width / 2);
 				CAShapeLayer * maskLayer1 = [CAShapeLayer layer];
-				maskLayer1.path = [UIBezierPath bezierPathWithRoundedRect: self.barView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii: (CGSize){10.0, 10.0}].CGPath;
+				maskLayer1.path = [UIBezierPath bezierPathWithRoundedRect:self.barView.bounds byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:self.barViewCornerRadiusSize].CGPath;
 				self.barView.layer.mask = maskLayer1;
 				CAShapeLayer * maskLayer2 = [CAShapeLayer layer];
 				maskLayer2.path = [UIBezierPath bezierPathWithRoundedRect: self.shortcutView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii: (CGSize){10.0, 10.0}].CGPath;
@@ -196,7 +197,7 @@ UIViewPropertyAnimator *panAnimator;
 			else if (point.x < bounds.size.width / 2 && self.isRightDirection) { // moving to the left
 				barCenter.x = self.barView.frame.size.width / 2;
 				CAShapeLayer *maskLayer1 = [CAShapeLayer layer];
-				maskLayer1.path = [UIBezierPath bezierPathWithRoundedRect: self.barView.bounds byRoundingCorners: UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii: (CGSize){10.0, 10.0}].CGPath;
+				maskLayer1.path = [UIBezierPath bezierPathWithRoundedRect:self.barView.bounds byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:self.barViewCornerRadiusSize].CGPath;
 				self.barView.layer.mask = maskLayer1;
 				CAShapeLayer * maskLayer2 = [CAShapeLayer layer];
 				maskLayer2.path = [UIBezierPath bezierPathWithRoundedRect: self.shortcutView.bounds byRoundingCorners: UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii: (CGSize){10.0, 10.0}].CGPath;

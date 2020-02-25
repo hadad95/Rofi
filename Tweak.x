@@ -2,7 +2,6 @@
 #import "SCView.h"
 #import "SCViewController.h"
 
-
 @interface SCWindow : UIWindow
 @end
 
