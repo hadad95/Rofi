@@ -7,7 +7,7 @@
 - (void)activeInterfaceOrientationWillChangeToOrientation:(long long)arg1;
 @end
 
-@interface SCViewController : UIViewController <SBIconViewDelegate, UIGestureRecognizerDelegate>//, SBUIActiveOrientationObserver>
+@interface SCViewController : UIViewController <SBIconViewDelegate, UIGestureRecognizerDelegate, UIScrollViewDelegate>//, SBUIActiveOrientationObserver>
 @property (nonatomic, assign) BOOL isViewVisible;
 @property (nonatomic, assign) BOOL isRightDirection;
 @property (nonatomic, assign) BOOL isDraggingShortcutView;
@@ -27,6 +27,7 @@
 - (void)hideView;
 - (void)showViewWithPropertyAnimator:(UIViewPropertyAnimator *)animator;
 - (void)hideViewWithPropertyAnimator:(UIViewPropertyAnimator *)animator;
-- (void)iconTapped:(id)arg1;
 - (void)blurViewTapped:(id)arg1;
+- (void)startTimeoutTimer;
+- (void)timeoutTimerFired:(NSTimer *)timer;
 @end

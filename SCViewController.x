@@ -6,6 +6,7 @@
 
 CGPoint longPressStartingPoint;
 UIViewPropertyAnimator *panAnimator;
+NSTimer *timeoutTimer;
 
 @implementation SCViewController
 
@@ -70,6 +71,7 @@ UIViewPropertyAnimator *panAnimator;
 	self.shortcutScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 80, bounds.size.height / 2)];
 	self.shortcutScrollView.translatesAutoresizingMaskIntoConstraints = false;
 	self.shortcutScrollView.showsVerticalScrollIndicator = NO;
+	self.shortcutScrollView.delegate = self;
 
 	self.blurView = [[UIVisualEffectView alloc] initWithEffect:nil];
 	self.blurView.frame = self.view.bounds;
@@ -97,20 +99,21 @@ UIViewPropertyAnimator *panAnimator;
     [self.shortcutStackView.topAnchor constraintEqualToAnchor:self.shortcutScrollView.topAnchor].active = true;
     [self.shortcutStackView.bottomAnchor constraintEqualToAnchor:self.shortcutScrollView.bottomAnchor].active = true;
 
-    /*
+    
     [self addIconViewToStackView:@"com.facebook.Facebook"];
     [self addIconViewToStackView:@"com.hammerandchisel.discord"];
     [self addIconViewToStackView:@"net.whatsapp.WhatsApp"];
     [self addIconViewToStackView:@"com.facebook.Messenger"];
     [self addIconViewToStackView:@"com.burbn.instagram"];
-    */
-
+    
+    /*
     [self addIconViewToStackView:@"com.hammerandchisel.discord"];
     [self addIconViewToStackView:@"com.atebits.Tweetie2"];
     [self addIconViewToStackView:@"com.apple.mobilesafari"];
     [self addIconViewToStackView:@"net.whatsapp.WhatsApp"];
     [self addIconViewToStackView:@"com.burbn.instagram"];
     [self addIconViewToStackView:@"com.toyopagroup.picaboo"];
+    */
 
     self.barView = [[UIView alloc] initWithFrame:CGRectMake(bounds.size.width - 5, 100, 5, 100)];
     self.barView.backgroundColor = [UIColor colorWithRed:0.6 green:0.67 blue:0.71 alpha:0.5];
@@ -282,12 +285,18 @@ UIViewPropertyAnimator *panAnimator;
 		[self.view addSubview:self.shortcutView];
 
 	UIViewPropertyAnimator *animator = [self showingViewPropertyAnimator];
+	[animator addCompletion:^ (UIViewAnimatingPosition finalPosition) {
+		[self startTimeoutTimer];
+	}];
 	[animator startAnimation];
 }
 
 - (void)hideView {
 	if (!self.isViewVisible && !self.isDraggingShortcutView)
 		return;
+
+	if (timeoutTimer != nil && timeoutTimer.valid)
+		[timeoutTimer invalidate];
 
 	self.isViewVisible = NO;
 	self.isDraggingShortcutView = NO;
@@ -308,6 +317,9 @@ UIViewPropertyAnimator *panAnimator;
 	self.isViewVisible = YES;
 	self.isDraggingShortcutView = NO;
 	[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
+	[animator addCompletion:^ (UIViewAnimatingPosition finalPosition) {
+		[self startTimeoutTimer];
+	}];
 	[animator startAnimation];
 }
 
@@ -340,6 +352,33 @@ UIViewPropertyAnimator *panAnimator;
 - (BOOL)iconViewCanBeginDrags:(id)arg1 {
 	return NO;
 }
+
+- (void)startTimeoutTimer {
+	if (timeoutTimer != nil && timeoutTimer.valid)
+		[timeoutTimer invalidate];
+
+	timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(timeoutTimerFired:) userInfo:nil repeats:NO];
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+	NSLog(@"scrollViewDidEndDecelerating called");
+	[self startTimeoutTimer];
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+	if (!decelerate)
+		[self startTimeoutTimer];
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+	[timeoutTimer invalidate];
+}
+
+- (void)timeoutTimerFired:(NSTimer *)timer {
+	[self hideView];
+	[timer invalidate];
+}
+
 /*
 - (void)activeInterfaceOrientationDidChangeToOrientation:(long long)arg1 willAnimateWithDuration:(double)arg2 fromOrientation:(long long)arg3 {}
 
