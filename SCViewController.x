@@ -336,6 +336,10 @@ UIViewPropertyAnimator *panAnimator;
 - (void)blurViewTapped:(id)arg1 {
 	[self hideView];
 }
+
+- (BOOL)iconViewCanBeginDrags:(id)arg1 {
+	return NO;
+}
 /*
 - (void)activeInterfaceOrientationDidChangeToOrientation:(long long)arg1 willAnimateWithDuration:(double)arg2 fromOrientation:(long long)arg3 {}
 
