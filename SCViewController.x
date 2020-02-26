@@ -115,7 +115,7 @@ NSTimer *timeoutTimer;
     [self addIconViewToStackView:@"com.toyopagroup.picaboo"];
     */
 
-    self.barView = [[UIView alloc] initWithFrame:CGRectMake(bounds.size.width - 5, 100, 5, 100)];
+    self.barView = [[UIView alloc] initWithFrame:CGRectMake(bounds.size.width - 10, 100, 10, 100)];
     self.barView.backgroundColor = [UIColor colorWithRed:0.6 green:0.67 blue:0.71 alpha:0.5];
     CAShapeLayer *maskLayer = [CAShapeLayer layer];
 	maskLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.barView.bounds byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:self.barViewCornerRadiusSize].CGPath;
@@ -357,7 +357,7 @@ NSTimer *timeoutTimer;
 	if (timeoutTimer != nil && timeoutTimer.valid)
 		[timeoutTimer invalidate];
 
-	timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(timeoutTimerFired:) userInfo:nil repeats:NO];
+	timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:99 target:self selector:@selector(timeoutTimerFired:) userInfo:nil repeats:NO];
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
