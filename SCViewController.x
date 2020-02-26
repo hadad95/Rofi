@@ -278,7 +278,6 @@ NSTimer *timeoutTimer;
 
 	self.isViewVisible = YES;
 	self.isDraggingShortcutView = NO;
-	[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
 	if (self.blurView.superview == nil)
 		[self.view addSubview:self.blurView];
 	if (self.shortcutView.superview == nil)
@@ -302,11 +301,12 @@ NSTimer *timeoutTimer;
 	self.isDraggingShortcutView = NO;
 	UIViewPropertyAnimator *animator = [self hidingViewPropertyAnimator];
 	[animator addCompletion:^ (UIViewAnimatingPosition finalPosition) {
-			if (self.shortcutView.superview != nil)
-				[self.shortcutView removeFromSuperview];
-			if (self.blurView.superview != nil)
-				[self.blurView removeFromSuperview];
-		}];
+		[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
+		if (self.shortcutView.superview != nil)
+			[self.shortcutView removeFromSuperview];
+		if (self.blurView.superview != nil)
+			[self.blurView removeFromSuperview];
+	}];
 	[animator startAnimation];
 }
 
@@ -316,7 +316,6 @@ NSTimer *timeoutTimer;
 
 	self.isViewVisible = YES;
 	self.isDraggingShortcutView = NO;
-	[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
 	[animator addCompletion:^ (UIViewAnimatingPosition finalPosition) {
 		[self startTimeoutTimer];
 	}];
@@ -331,11 +330,12 @@ NSTimer *timeoutTimer;
 	self.isDraggingShortcutView = NO;
 	animator.reversed = YES;
 	[animator addCompletion:^ (UIViewAnimatingPosition finalPosition) {
-			if (self.shortcutView.superview != nil)
-				[self.shortcutView removeFromSuperview];
-			if (self.blurView.superview != nil)
-				[self.blurView removeFromSuperview];
-		}];
+		[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
+		if (self.shortcutView.superview != nil)
+			[self.shortcutView removeFromSuperview];
+		if (self.blurView.superview != nil)
+			[self.blurView removeFromSuperview];
+	}];
 	[animator startAnimation];
 }
 
