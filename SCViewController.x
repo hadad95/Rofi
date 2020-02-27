@@ -7,6 +7,7 @@
 CGPoint longPressStartingPoint;
 UIViewPropertyAnimator *panAnimator;
 NSTimer *timeoutTimer;
+unsigned char numberOfIcons;
 
 @implementation SCViewController
 
@@ -63,14 +64,23 @@ NSTimer *timeoutTimer;
 
 	self.isRightDirection = YES;
 	self.barViewCornerRadiusSize = (CGSize){10, 10};
+	numberOfIcons = 3;
+
+	SBIconView *tempIconView = [[%c(SBIconView) alloc] initWithContentType:0];
+	CGFloat shortcutViewWidth = tempIconView.frame.size.width + 20;
+	CGFloat shortcutStackViewSpacing = 20;
+	CGFloat shortcutStackViewMarginTop = 10;
+	CGFloat shortcutStackViewMarginBottom = 20;
+	CGFloat shortcutViewHeight = tempIconView.frame.size.height * numberOfIcons + (numberOfIcons - 1) * shortcutStackViewSpacing + shortcutStackViewMarginTop + shortcutStackViewMarginBottom;
 
 	CGRect bounds = [[UIScreen mainScreen] bounds];
-	CGFloat ratio = 0.7;
-	CGRect frame = CGRectMake(bounds.size.width, bounds.size.height * (1 - ratio) / 2, 80, bounds.size.height * ratio);
+	//CGFloat ratio = 0.7;
+	CGRect frame = CGRectMake(bounds.size.width, (bounds.size.height - shortcutViewHeight) / 2, shortcutViewWidth, shortcutViewHeight);
 	self.shortcutView = [((SCView *)[%c(SCView) alloc]) initWithFrame:frame];
-	self.shortcutScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 80, bounds.size.height / 2)];
+	self.shortcutScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.shortcutView.frame.size.width, self.shortcutView.frame.size.height)];
 	self.shortcutScrollView.translatesAutoresizingMaskIntoConstraints = false;
 	self.shortcutScrollView.showsVerticalScrollIndicator = NO;
+	self.shortcutScrollView.pagingEnabled = YES;
 	self.shortcutScrollView.delegate = self;
 
 	self.blurView = [[UIVisualEffectView alloc] initWithEffect:nil];
@@ -82,9 +92,9 @@ NSTimer *timeoutTimer;
 	self.shortcutStackView.axis = UILayoutConstraintAxisVertical;
 	self.shortcutStackView.distribution = UIStackViewDistributionFillProportionally;
 	self.shortcutStackView.alignment = UIStackViewAlignmentCenter;
-	self.shortcutStackView.spacing = 20;
+	self.shortcutStackView.spacing = shortcutStackViewSpacing;
 	self.shortcutStackView.layoutMarginsRelativeArrangement = YES;
-	self.shortcutStackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(10, 0, 20, 0);
+	self.shortcutStackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(shortcutStackViewMarginTop, 0, shortcutStackViewMarginBottom, 0);
 
 	self.shortcutStackView.translatesAutoresizingMaskIntoConstraints = false;
 	[self.shortcutScrollView addSubview:self.shortcutStackView];
@@ -99,21 +109,21 @@ NSTimer *timeoutTimer;
     [self.shortcutStackView.topAnchor constraintEqualToAnchor:self.shortcutScrollView.topAnchor].active = true;
     [self.shortcutStackView.bottomAnchor constraintEqualToAnchor:self.shortcutScrollView.bottomAnchor].active = true;
 
-    
+    /*
     [self addIconViewToStackView:@"com.facebook.Facebook"];
     [self addIconViewToStackView:@"com.hammerandchisel.discord"];
     [self addIconViewToStackView:@"net.whatsapp.WhatsApp"];
     [self addIconViewToStackView:@"com.facebook.Messenger"];
     [self addIconViewToStackView:@"com.burbn.instagram"];
+    */
     
-    /*
     [self addIconViewToStackView:@"com.hammerandchisel.discord"];
     [self addIconViewToStackView:@"com.atebits.Tweetie2"];
     [self addIconViewToStackView:@"com.apple.mobilesafari"];
     [self addIconViewToStackView:@"net.whatsapp.WhatsApp"];
     [self addIconViewToStackView:@"com.burbn.instagram"];
     [self addIconViewToStackView:@"com.toyopagroup.picaboo"];
-    */
+    
 
     self.barView = [[UIView alloc] initWithFrame:CGRectMake(bounds.size.width - 10, 100, 10, 100)];
     self.barView.backgroundColor = [UIColor colorWithRed:0.6 green:0.67 blue:0.71 alpha:0.5];
@@ -171,6 +181,7 @@ NSTimer *timeoutTimer;
 			[UIView animateWithDuration:0.25
 				animations:^ {
 					self.barView.backgroundColor = [self.barView.backgroundColor colorWithAlphaComponent:1];
+					self.barView.transform = CGAffineTransformScale(self.barView.transform, 1.1, 1.1);
 				}];
 			break;
 		}
@@ -224,6 +235,7 @@ NSTimer *timeoutTimer;
 			[UIView animateWithDuration:0.25
 				animations:^ {
 					self.barView.backgroundColor = [self.barView.backgroundColor colorWithAlphaComponent:0.5];
+					self.barView.transform = CGAffineTransformScale(self.barView.transform, 1/1.1, 1/1.1);
 				}];
 			break;
 		}
