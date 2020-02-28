@@ -357,6 +357,11 @@ unsigned char numberOfIcons;
 
 - (void)blurViewTapped:(id)arg1 {
 	[self hideView];
+	/*
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		[[%c(LSApplicationWorkspace) defaultWorkspace] openSensitiveURL:[NSURL URLWithString:@"prefs:root=Rofi"] withOptions:nil];
+	});
+	*/
 }
 
 - (BOOL)iconViewCanBeginDrags:(id)arg1 {
