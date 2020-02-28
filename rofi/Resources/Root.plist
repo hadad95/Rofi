@@ -168,6 +168,20 @@
 			<key>action</key>
 			<string>respring</string>
 		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>bundle</key>
+			<string>Rofi</string>
+			<key>detail</key>
+			<string>RFAppListController</string>
+			<key>overridePrincipalClass</key>
+			<true/>
+			<key>isController</key>
+			<true/>
+			<key>label</key>
+			<string>Test applist</string>
+		</dict>
 	</array>
 	<key>title</key>
 	<string>Rofi</string>
