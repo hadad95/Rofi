@@ -15,7 +15,7 @@
 @end
 
 @interface SBIconController : UIViewController
-@property(retain, nonatomic) SBIconModel *model;;
+@property(retain, nonatomic) SBIconModel *model;
 + (SBIconController *)sharedInstance;
 @end
 
