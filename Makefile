@@ -11,3 +11,5 @@ Rofi_FILES = Tweak.x RFViewController.x RFView.x
 Rofi_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
+SUBPROJECTS += rofi
+include $(THEOS_MAKE_PATH)/aggregate.mk
