@@ -10,7 +10,7 @@
 			<key>label</key>
 			<string>General settings</string>
 			<key>footerText</key>
-			<string>Requires a respring.</string>
+			<string>Require a respring.</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -23,6 +23,36 @@
 			<string>isEnabled</string>
 			<key>label</key>
 			<string>Enabled</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>bundle</key>
+			<string>AppList</string>
+			<key>isController</key>
+			<string>1</string>
+			<key>label</key>
+			<string>Selected apps</string>
+			<key>ALAllowsSelection</key>
+			<string>1</string>
+		</dict>
+		<dict>
+		    <key>cellClass</key>
+		    <string>HBStepperTableCell</string>
+		    <key>default</key>
+		    <real>4</real>
+		    <key>defaults</key>
+		    <string>com.kef.rofi</string>
+		    <key>key</key>
+		    <string>numberOfIcons</string>
+		    <key>label</key>
+		    <string>Apps per page: %i</string>
+		    <key>max</key>
+		    <real>6</real>
+		    <key>min</key>
+		    <real>1</real>
+		    <key>singularLabel</key>
+		    <string>Apps per page: 1</string>
 		</dict>
 		<dict>
 			<key>cell</key>
