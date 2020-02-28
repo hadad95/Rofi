@@ -1,6 +1,4 @@
-#import "SCViewController.h"
-#import "SCView.h"
-#import "Tweak.h"
+#import "RFViewController.h"
 
 #define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 
@@ -9,7 +7,7 @@ UIViewPropertyAnimator *panAnimator;
 NSTimer *timeoutTimer;
 unsigned char numberOfIcons;
 
-@implementation SCViewController
+@implementation RFViewController
 
 - (BOOL)shouldAutorotate {
 	return NO;
@@ -76,7 +74,7 @@ unsigned char numberOfIcons;
 	CGRect bounds = [[UIScreen mainScreen] bounds];
 	//CGFloat ratio = 0.7;
 	CGRect frame = CGRectMake(bounds.size.width, (bounds.size.height - shortcutViewHeight) / 2, shortcutViewWidth, shortcutViewHeight);
-	self.shortcutView = [((SCView *)[%c(SCView) alloc]) initWithFrame:frame];
+	self.shortcutView = [((RFView *)[%c(RFView) alloc]) initWithFrame:frame];
 	self.shortcutScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.shortcutView.frame.size.width, self.shortcutView.frame.size.height)];
 	self.shortcutScrollView.translatesAutoresizingMaskIntoConstraints = false;
 	self.shortcutScrollView.showsVerticalScrollIndicator = NO;

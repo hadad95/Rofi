@@ -1,0 +1,2 @@
+@interface RFView : UIView
+@end

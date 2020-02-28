@@ -1,6 +1,6 @@
-#import "SCView.h"
+#import "RFView.h"
 
-@implementation SCView
+@implementation RFView
 - (id)initWithFrame:(CGRect)frame {
 	self = [super initWithFrame:frame];
 	if (self) {

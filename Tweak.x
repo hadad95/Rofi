@@ -1,15 +1,15 @@
 #import "Tweak.h"
-#import "SCView.h"
-#import "SCViewController.h"
+#import "RFView.h"
+#import "RFViewController.h"
 
-@interface SCWindow : UIWindow
+@interface RFWindow : UIWindow
 @end
 
-static SCWindow *window;
-static SCViewController *viewController;
+static RFWindow *window;
+static RFViewController *viewController;
 static UIScreenEdgePanGestureRecognizer *pan;
 
-%subclass SCWindow : UIWindow
+%subclass RFWindow : UIWindow
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
 	UIView *viewAtPoint = [self.rootViewController.view hitTest:point withEvent:event];
 	BOOL ret;
@@ -41,8 +41,8 @@ static UIScreenEdgePanGestureRecognizer *pan;
 
 - (void)applicationDidFinishLaunching:(id)application {
 	%orig;
-	viewController = [SCViewController new];
-	window = [[%c(SCWindow) alloc] initWithFrame:UIScreen.mainScreen.bounds];
+	viewController = [RFViewController new];
+	window = [[%c(RFWindow) alloc] initWithFrame:UIScreen.mainScreen.bounds];
 	window.screen = UIScreen.mainScreen;
 	window.rootViewController = viewController;
 	window.userInteractionEnabled = YES;
@@ -53,7 +53,7 @@ static UIScreenEdgePanGestureRecognizer *pan;
 	/*
 	pan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:window.rootViewController action:@selector(handlePan:)];
 	[pan setEdges:UIRectEdgeRight];
-	[pan setDelegate:(SCViewController *)window.rootViewController];
+	[pan setDelegate:(RFViewController *)window.rootViewController];
 	[window.rootViewController.view addGestureRecognizer:pan];
 	SBSystemGestureManager *gestureManager = [%c(SBSystemGestureManager) mainDisplayManager];
 	FBSDisplayIdentity *dispIdentity = MSHookIvar<FBSDisplayIdentity *>(gestureManager, "_displayIdentity");

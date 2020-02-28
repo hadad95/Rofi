@@ -1,2 +1,0 @@
-@interface SCView : UIView
-@end

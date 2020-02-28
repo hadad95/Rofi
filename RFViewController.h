@@ -1,4 +1,4 @@
-#import "SCView.h"
+#import "RFView.h"
 #import "SBIconViewDelegate.h"
 #import "Tweak.h"
 
@@ -7,12 +7,12 @@
 - (void)activeInterfaceOrientationWillChangeToOrientation:(long long)arg1;
 @end
 
-@interface SCViewController : UIViewController <SBIconViewDelegate, UIGestureRecognizerDelegate, UIScrollViewDelegate>//, SBUIActiveOrientationObserver>
+@interface RFViewController : UIViewController <SBIconViewDelegate, UIGestureRecognizerDelegate, UIScrollViewDelegate>//, SBUIActiveOrientationObserver>
 @property (nonatomic, assign) BOOL isViewVisible;
 @property (nonatomic, assign) BOOL isRightDirection;
 @property (nonatomic, assign) BOOL isDraggingShortcutView;
 @property (nonatomic, assign) CGSize barViewCornerRadiusSize;
-@property (nonatomic, retain) SCView *shortcutView;
+@property (nonatomic, retain) RFView *shortcutView;
 @property (nonatomic, retain) UIStackView *shortcutStackView;
 @property (nonatomic, retain) UIScrollView *shortcutScrollView;
 @property (nonatomic, retain) UIVisualEffectView *blurView;
