@@ -5,6 +5,7 @@
 @implementation RFAppListController
 - (void)viewDidLoad {
 	[super viewDidLoad];
+	NSLog(@"[RF] conforms to protocol? %@", [self conformsToProtocol:@protocol(UITableViewDataSource)] ? @"YES" : @"NO");
 	//[self setEditingButtonHidden:YES animated:NO];
 	//[self setEditable:YES];
 }
@@ -49,6 +50,10 @@
 
 -(BOOL)tableView:(id)arg1 canEditRowAtIndexPath:(id)arg2 {
 	return YES;
+}
+
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+	NSLog(@"[RF] moveRowAtIndexPath called");
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
