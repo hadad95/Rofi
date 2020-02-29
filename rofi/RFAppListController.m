@@ -2,19 +2,35 @@
 #include <AppList/AppList.h>
 #include <Preferences/PSSpecifier.h>
 
+NSMutableArray *sortedDisplayIdentifiers;
+NSMutableDictionary *applications;
+ALApplicationList *appList;
+PSSpecifier *firstSection;
+
 @implementation RFAppListController
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	NSLog(@"[RF] conforms to protocol? %@", [self conformsToProtocol:@protocol(UITableViewDataSource)] ? @"YES" : @"NO");
 	//[self setEditingButtonHidden:YES animated:NO];
 	//[self setEditable:YES];
 }
 
 - (NSArray *)specifiers {
-	ALApplicationList *appList = [ALApplicationList sharedApplicationList];
+	NSLog(@"[RF] specifiers called");
+	appList = [ALApplicationList sharedApplicationList];
 	NSMutableArray *result = [[NSMutableArray alloc] init];
-	NSArray *sortedDisplayIdentifiers;
-	NSDictionary *applications = [appList applicationsFilteredUsingPredicate:[NSPredicate predicateWithFormat:@"isSystemApplication = TRUE"] onlyVisible:YES titleSortedIdentifiers:&sortedDisplayIdentifiers];
+	//NSArray *sortedDisplayIdentifiers;
+	NSArray *testArray;
+	applications = [[appList applicationsFilteredUsingPredicate:[NSPredicate predicateWithFormat:@"isSystemApplication = TRUE"] onlyVisible:YES titleSortedIdentifiers:&testArray] mutableCopy];
+	sortedDisplayIdentifiers = [testArray mutableCopy];
+	PSSpecifier *specifier0 = [PSSpecifier preferenceSpecifierNamed:@"Added apps"
+                                                            target:self
+                                                               set:nil
+                                                               get:nil
+                                                            detail:Nil
+                                                              cell:PSGroupCell
+                                                              edit:Nil];
+	[result addObject:specifier0];
+	firstSection = specifier0;
 	PSSpecifier *specifier1 = [PSSpecifier preferenceSpecifierNamed:@"System apps"
                                                             target:self
                                                                set:nil
@@ -45,7 +61,10 @@
 }
 
 - (long long)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
-	return UITableViewCellEditingStyleInsert;
+	if (indexPath.section == 0)
+		return UITableViewCellEditingStyleDelete;
+	else
+		return UITableViewCellEditingStyleInsert;
 }
 
 -(BOOL)tableView:(id)arg1 canEditRowAtIndexPath:(id)arg2 {
@@ -53,13 +72,41 @@
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-	NSLog(@"[RF] moveRowAtIndexPath called");
+	NSLog(@"[RF] moveRowAtIndexPath called, sourceIndexPath = %@, destinationIndexPath = %@", sourceIndexPath, destinationIndexPath);
+	NSLog(@"[RF] source section = %ld, row = %ld, item = %ld", sourceIndexPath.section, sourceIndexPath.row, sourceIndexPath.item);
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-	NSLog(@"[RF] canMoveRowAtIndexPath called");
-	return YES;
+	//NSLog(@"[RF] canMoveRowAtIndexPath called");
+	if (indexPath.section == 0)
+		return YES;
+	else
+		return NO;
 }
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(long long)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (editingStyle == UITableViewCellEditingStyleInsert) {
+		NSInteger ind = indexPath.row + [tableView numberOfRowsInSection:0] + 3;
+		NSLog(@"[RF] numberOfRowsInSection = %ld, row = %ld, ind = %ld", [tableView numberOfRowsInSection:0], indexPath.row, ind);
+		//[tableView moveRowAtIndexPath:indexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+		//[self insertSpecifier:_specifiers[indexPath.row + [tableView numberOfRowsInSection:0] + 2] atIndex:0 animated:YES];
+		UIImage *icon = [appList iconOfSize:ALApplicationIconSizeSmall forDisplayIdentifier:sortedDisplayIdentifiers[indexPath.row]];
+		PSSpecifier *specifier = [PSSpecifier preferenceSpecifierNamed:applications[sortedDisplayIdentifiers[indexPath.row]]
+	                                                            target:self
+	                                                               set:nil
+	                                                               get:nil
+	                                                            detail:Nil
+	                                                              cell:PSListItemCell
+	                                                              edit:Nil];
+		[specifier setProperty:@YES forKey:@"enabled"];
+		[specifier setProperty:icon forKey:@"iconImage"];
+		[self insertSpecifier:specifier afterSpecifier:firstSection animated:YES];
+		[self removeSpecifierAtIndex:ind animated:YES];
+		[applications removeObjectForKey:sortedDisplayIdentifiers[indexPath.row]];
+		[sortedDisplayIdentifiers removeObjectAtIndex:indexPath.row];
+	}
+}
+
 /*
 -(id)_editButtonBarItem {
 	return nil;
