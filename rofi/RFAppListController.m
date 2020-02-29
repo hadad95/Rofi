@@ -20,7 +20,7 @@ PSSpecifier *firstSection;
 	NSMutableArray *result = [[NSMutableArray alloc] init];
 	//NSArray *sortedDisplayIdentifiers;
 	NSArray *testArray;
-	applications = [[appList applicationsFilteredUsingPredicate:[NSPredicate predicateWithFormat:@"isSystemApplication = TRUE"] onlyVisible:YES titleSortedIdentifiers:&testArray] mutableCopy];
+	applications = [[appList applicationsFilteredUsingPredicate:[NSPredicate predicateWithFormat:@"isSystemApplication = FALSE"] onlyVisible:YES titleSortedIdentifiers:&testArray] mutableCopy];
 	sortedDisplayIdentifiers = [testArray mutableCopy];
 	PSSpecifier *specifier0 = [PSSpecifier preferenceSpecifierNamed:@"Added apps"
                                                             target:self
@@ -76,6 +76,13 @@ PSSpecifier *firstSection;
 	NSLog(@"[RF] source section = %ld, row = %ld, item = %ld", sourceIndexPath.section, sourceIndexPath.row, sourceIndexPath.item);
 }
 
+- (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
+	if (sourceIndexPath.section != proposedDestinationIndexPath.section)
+		return sourceIndexPath;
+	else
+		return proposedDestinationIndexPath;
+}
+
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 	//NSLog(@"[RF] canMoveRowAtIndexPath called");
 	if (indexPath.section == 0)
@@ -100,7 +107,8 @@ PSSpecifier *firstSection;
 	                                                              edit:Nil];
 		[specifier setProperty:@YES forKey:@"enabled"];
 		[specifier setProperty:icon forKey:@"iconImage"];
-		[self insertSpecifier:specifier afterSpecifier:firstSection animated:YES];
+		//[self insertSpecifier:specifier afterSpecifier:firstSection animated:YES];
+		[self insertSpecifier:specifier atIndex:1 animated:YES];
 		[self removeSpecifierAtIndex:ind animated:YES];
 		[applications removeObjectForKey:sortedDisplayIdentifiers[indexPath.row]];
 		[sortedDisplayIdentifiers removeObjectAtIndex:indexPath.row];

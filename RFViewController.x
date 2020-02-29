@@ -64,7 +64,14 @@ unsigned char numberOfIcons;
 	self.barViewCornerRadiusSize = (CGSize){10, 10};
 	numberOfIcons = 3;
 
-	SBIconView *tempIconView = [[%c(SBIconView) alloc] initWithContentType:0];
+	SBIconView *tempIconView;
+	if (SYSTEM_VERSION_LESS_THAN(@"13")) {
+		tempIconView = [[%c(SBIconView) alloc] initWithContentType:0];
+	}
+	else {
+		tempIconView = [[%c(SBIconView) alloc] initWithConfigurationOptions:0];
+	}
+
 	CGFloat shortcutViewWidth = tempIconView.frame.size.width + 20;
 	CGFloat shortcutStackViewSpacing = 20;
 	CGFloat shortcutStackViewMarginTop = 10;
