@@ -10,8 +10,9 @@ PSSpecifier *firstSection;
 @implementation RFAppListController
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	//[self setEditingButtonHidden:YES animated:NO];
-	//[self setEditable:YES];
+	[self setEditingButtonHidden:YES animated:NO];
+	[self setEditable:YES];
+	self.navigationItem.hidesBackButton = NO;
 }
 
 - (NSArray *)specifiers {
