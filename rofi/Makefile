@@ -9,7 +9,7 @@ Rofi_FILES = RFRootListController.m RFAppListController.m
 Rofi_INSTALL_PATH = /Library/PreferenceBundles
 Rofi_FRAMEWORKS = UIKit
 Rofi_PRIVATE_FRAMEWORKS = Preferences
-Rofi_LIBRARIES = applist
+Rofi_LIBRARIES = applist sparkcolourpicker sparkapplist
 Rofi_EXTRA_FRAMEWORKS += Cephei CepheiPrefs
 Rofi_CFLAGS = -fobjc-arc
 

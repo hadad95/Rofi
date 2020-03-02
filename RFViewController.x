@@ -401,6 +401,15 @@ unsigned char numberOfIcons;
 	[timer invalidate];
 }
 
+- (BOOL)iconViewShouldBeginShortcutsPresentation:(id)arg1 {
+	NSLog(@"[RF] iconViewShouldBeginShortcutsPresentation called");
+	return YES;
+}
+- (BOOL)iconView:(id)arg1 shouldActivateApplicationShortcutItem:(id)arg2 atIndex:(unsigned long long)arg3 {
+	NSLog(@"[RF] iconView:shouldActivateApplicationShortcutItematIndex: called");
+	return YES;
+}
+
 /*
 - (void)activeInterfaceOrientationDidChangeToOrientation:(long long)arg1 willAnimateWithDuration:(double)arg2 fromOrientation:(long long)arg3 {}
 
