@@ -30,7 +30,7 @@
 	        <key>label</key>
 	        <string>Select apps to blacklist...</string>
 	        <key>action</key>
-	        <string>selectExcludeApps</string>
+	        <string>selectApps</string>
 	    </dict>
 		<dict>
 		    <key>cellClass</key>

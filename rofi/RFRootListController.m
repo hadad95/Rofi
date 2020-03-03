@@ -1,5 +1,7 @@
 #include "RFRootListController.h"
 #import "SparkAppListTableViewController.h"
+#import "RFAppListController.h"
+#import "SparkAppList.h"
 
 @implementation RFRootListController
 
@@ -11,13 +13,20 @@
 	return _specifiers;
 }
 
--(void)selectExcludeApps
+-(void)selectApps
 {
-    // Replace "com.spark.notchlessprefs" and "excludedApps" with your strings
-    //SparkAppListTableViewController* s = [[SparkAppListTableViewController alloc] initWithIdentifier:@"com.spark.notchlessprefs" andKey:@"excludedApps"];
-    UITableViewController *s = [[UITableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+	NSLog(@"[RF] selectApps called. Pushing view controller...");
+    RFAppListController *appListController = [[RFAppListController alloc] initWithStyle:UITableViewStyleGrouped];
+    NSLog(@"[RF] pushing view controller...");
+    [self.navigationController pushViewController:appListController animated:YES];
+    self.navigationItem.hidesBackButton = FALSE;
+    
+    /*
+    SparkAppListTableViewController* s = [[SparkAppListTableViewController alloc] initWithIdentifier:@"com.spark.notchlessprefs" andKey:@"excludedApps"];
+
     [self.navigationController pushViewController:s animated:YES];
     self.navigationItem.hidesBackButton = FALSE;
+    */
 }
 
 - (void)respring {

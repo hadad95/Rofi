@@ -1,6 +1,6 @@
 include $(THEOS)/makefiles/common.mk
 
-ARCHS=arm64 arm64e
+ARCHS=arm64
 TARGET=iphone:clang:12.4:12.4
 
 BUNDLE_NAME = Rofi
@@ -9,7 +9,7 @@ Rofi_FILES = RFRootListController.m RFAppListController.m
 Rofi_INSTALL_PATH = /Library/PreferenceBundles
 Rofi_FRAMEWORKS = UIKit
 Rofi_PRIVATE_FRAMEWORKS = Preferences
-Rofi_LIBRARIES = applist sparkcolourpicker sparkapplist
+Rofi_LIBRARIES = sparkcolourpicker sparkapplist
 Rofi_EXTRA_FRAMEWORKS += Cephei CepheiPrefs
 Rofi_CFLAGS = -fobjc-arc
 

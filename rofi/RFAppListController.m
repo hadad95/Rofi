@@ -1,20 +1,41 @@
 #include "RFAppListController.h"
-#include <AppList/AppList.h>
+//#include <AppList/AppList.h>
 #include <Preferences/PSSpecifier.h>
+#import "SparkAppList.h"
+#import "SparkAppItem.h"
 
-NSMutableArray *sortedDisplayIdentifiers;
-NSMutableDictionary *applications;
-ALApplicationList *appList;
-PSSpecifier *firstSection;
+NSMutableArray *userApps;
+NSMutableArray *selectedApps;
 
 @implementation RFAppListController
+
+- (RFAppListController *)initWithStyle:(UITableViewStyle)style {
+	self = [super initWithStyle:style];
+	selectedApps = [[NSMutableArray alloc] init];
+	SparkAppList *appList = [[SparkAppList alloc] init];
+	//NSLog(@"[RF] viewDidLoad called, self = %p", self);
+	__weak RFAppListController *weakSelf = self;
+	[appList getAppList:^(NSArray *args) {
+		//NSLog(@"[RF] block called. args length = %lu", [args count]);
+		userApps = [args mutableCopy];
+		NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
+		[userApps sortUsingDescriptors:@[sortDescriptor]];
+		NSLog(@"[RF] block done");
+		[weakSelf.tableView reloadData];
+	}];
+	NSLog(@"[RF] init done");
+	return self;
+}
+
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	[self setEditingButtonHidden:YES animated:NO];
-	[self setEditable:YES];
+	//[self setEditingButtonHidden:YES animated:NO];
+	//[self setEditable:YES];
+	[self setEditing:YES animated:NO];
 	self.navigationItem.hidesBackButton = NO;
 }
 
+/*
 - (NSArray *)specifiers {
 	NSLog(@"[RF] specifiers called");
 	appList = [ALApplicationList sharedApplicationList];
@@ -60,8 +81,44 @@ PSSpecifier *firstSection;
 	//NSLog(@"[RF] _specifiers = %@", _specifiers);
 	return _specifiers;
 }
+*/
 
-- (long long)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if (section == 0)
+        return @"Selected apps";
+    else
+        return @"User apps";
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+	if (section == 0)
+		return selectedApps.count;
+	else
+		return userApps.count;
+	NSLog(@"[RF] numberOfRowsInSection called, userApps.count = %lu", userApps.count);
+	return userApps.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+	if (cell == nil)
+    	cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
+	if (indexPath.section == 0) {
+		cell.textLabel.text = ((SparkAppItem *)selectedApps[indexPath.row]).displayName;
+		cell.imageView.image = [(SparkAppItem *)selectedApps[indexPath.row] icon];
+	}
+	else {
+		cell.textLabel.text = ((SparkAppItem *)userApps[indexPath.row]).displayName;
+		cell.imageView.image = [(SparkAppItem *)userApps[indexPath.row] icon];
+	}
+	return cell;
+}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (indexPath.section == 0)
 		return UITableViewCellEditingStyleDelete;
 	else
@@ -92,7 +149,33 @@ PSSpecifier *firstSection;
 		return NO;
 }
 
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(long long)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (editingStyle == UITableViewCellEditingStyleInsert) {
+		SparkAppItem *app = userApps[indexPath.row];
+		NSLog(@"[RF] app = %@", app);
+		[selectedApps addObject:app];
+		[userApps removeObject:app];
+		NSLog(@"[RF] selectedApps = %@", selectedApps);
+		[tableView beginUpdates];
+		[tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:selectedApps.count-1 inSection:0]] withRowAnimation:UITableViewRowAnimationTop];
+		[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationTop];
+		[tableView endUpdates];
+	}
+	else if (editingStyle == UITableViewCellEditingStyleDelete) {
+		SparkAppItem *app = selectedApps[indexPath.row];
+		[userApps addObject:app];
+		[selectedApps removeObject:app];
+		NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
+		[userApps sortUsingDescriptors:@[sortDescriptor]];
+		NSUInteger index = [userApps indexOfObject:app];
+		[tableView beginUpdates];
+		[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationTop];
+		[tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:1]] withRowAnimation:UITableViewRowAnimationTop];
+		[tableView endUpdates];
+	}
+}
+/*
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (editingStyle == UITableViewCellEditingStyleInsert) {
 		NSInteger ind = indexPath.row + [tableView numberOfRowsInSection:0] + 3;
 		NSLog(@"[RF] numberOfRowsInSection = %ld, row = %ld, ind = %ld", [tableView numberOfRowsInSection:0], indexPath.row, ind);
@@ -115,7 +198,7 @@ PSSpecifier *firstSection;
 		[sortedDisplayIdentifiers removeObjectAtIndex:indexPath.row];
 	}
 }
-
+*/
 /*
 -(id)_editButtonBarItem {
 	return nil;
