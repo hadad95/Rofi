@@ -28,7 +28,7 @@
 	        <key>cell</key>
 	        <string>PSButtonCell</string>
 	        <key>label</key>
-	        <string>Select apps to blacklist...</string>
+	        <string>Selected Applications</string>
 	        <key>action</key>
 	        <string>selectApps</string>
 	    </dict>
@@ -186,20 +186,6 @@
 			<string>com.kef.rofi</string>
 			<key>action</key>
 			<string>respring</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSLinkCell</string>
-			<key>bundle</key>
-			<string>Rofi</string>
-			<key>detail</key>
-			<string>RFAppListController</string>
-			<key>overridePrincipalClass</key>
-			<true/>
-			<key>isController</key>
-			<true/>
-			<key>label</key>
-			<string>Test applist</string>
 		</dict>
 	</array>
 	<key>title</key>

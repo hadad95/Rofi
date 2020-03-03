@@ -33,6 +33,7 @@ NSMutableArray *selectedApps;
 	//[self setEditable:YES];
 	[self setEditing:YES animated:NO];
 	self.navigationItem.hidesBackButton = NO;
+	self.title = @"Selected Applications";
 }
 
 /*
@@ -132,6 +133,11 @@ NSMutableArray *selectedApps;
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
 	NSLog(@"[RF] moveRowAtIndexPath called, sourceIndexPath = %@, destinationIndexPath = %@", sourceIndexPath, destinationIndexPath);
 	NSLog(@"[RF] source section = %ld, row = %ld, item = %ld", sourceIndexPath.section, sourceIndexPath.row, sourceIndexPath.item);
+	if (sourceIndexPath.section == 0 && destinationIndexPath.section == 0) {
+		SparkAppItem *app = selectedApps[sourceIndexPath.row];
+		[selectedApps removeObjectAtIndex:sourceIndexPath.row];
+		[selectedApps insertObject:app atIndex:destinationIndexPath.row];
+	}
 }
 
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {

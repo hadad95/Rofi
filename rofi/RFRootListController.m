@@ -19,7 +19,6 @@
     RFAppListController *appListController = [[RFAppListController alloc] initWithStyle:UITableViewStyleGrouped];
     NSLog(@"[RF] pushing view controller...");
     [self.navigationController pushViewController:appListController animated:YES];
-    self.navigationItem.hidesBackButton = FALSE;
     
     /*
     SparkAppListTableViewController* s = [[SparkAppListTableViewController alloc] initWithIdentifier:@"com.spark.notchlessprefs" andKey:@"excludedApps"];
