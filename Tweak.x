@@ -49,7 +49,7 @@ static UIScreenEdgePanGestureRecognizer *pan;
 	window.opaque = NO;
 	window.hidden = NO;
 	window.backgroundColor = [UIColor clearColor];
-	window.windowLevel = UIWindowLevelAlert + 1;
+	window.windowLevel = 1074; // CC Window - 1 //UIWindowLevelAlert + 1;
 	/*
 	pan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:window.rootViewController action:@selector(handlePan:)];
 	[pan setEdges:UIRectEdgeRight];

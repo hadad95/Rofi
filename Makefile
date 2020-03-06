@@ -14,3 +14,8 @@ Rofi_EXTRA_FRAMEWORKS = Cephei
 include $(THEOS_MAKE_PATH)/tweak.mk
 SUBPROJECTS += rofi
 include $(THEOS_MAKE_PATH)/aggregate.mk
+
+BUNDLE_NAME = Assets
+Assets_INSTALL_PATH = /Library/Application Support/Rofi
+
+include $(THEOS_MAKE_PATH)/bundle.mk

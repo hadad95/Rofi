@@ -145,6 +145,21 @@ unsigned char numberOfIcons;
 	UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
 	longPress.minimumPressDuration = 0.5;
 	[self.barView addGestureRecognizer:longPress];
+
+	// Cog view
+
+	UIView *cogParentView = [[UIView alloc] initWithFrame:CGRectMake(100, 100, 45, 45)];
+	cogParentView.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.2];
+	cogParentView.layer.cornerRadius = cogParentView.frame.size.width / 2.0;
+	NSLog(@"[RF] bundle = %@", [NSBundle bundleWithPath:@"/Library/Application Support/Rofi/Assets.bundle"]);
+	UIImageView *cogView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"cog.png" inBundle:[NSBundle bundleWithPath:@"/Library/Application Support/Rofi/Assets.bundle"] compatibleWithTraitCollection:nil]];
+	[cogParentView addSubview:cogView];
+	cogView.translatesAutoresizingMaskIntoConstraints = false;
+	//cogParentView.translatesAutoresizingMaskIntoConstraints = false;
+	[cogView.centerXAnchor constraintEqualToAnchor:cogParentView.centerXAnchor].active = true;
+	[cogView.centerYAnchor constraintEqualToAnchor:cogParentView.centerYAnchor].active = true;
+	//cogView.frame = CGRectMake(100, 100, 30, 30);
+	[self.blurView.contentView addSubview:cogParentView];
 }
 
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture {
