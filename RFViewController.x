@@ -146,20 +146,25 @@ unsigned char numberOfIcons;
 	longPress.minimumPressDuration = 0.5;
 	[self.barView addGestureRecognizer:longPress];
 
-	// Cog view
+	// Cog button
 
-	UIView *cogParentView = [[UIView alloc] initWithFrame:CGRectMake(100, 100, 45, 45)];
-	cogParentView.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.2];
-	cogParentView.layer.cornerRadius = cogParentView.frame.size.width / 2.0;
-	NSLog(@"[RF] bundle = %@", [NSBundle bundleWithPath:@"/Library/Application Support/Rofi/Assets.bundle"]);
-	UIImageView *cogView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"cog.png" inBundle:[NSBundle bundleWithPath:@"/Library/Application Support/Rofi/Assets.bundle"] compatibleWithTraitCollection:nil]];
-	[cogParentView addSubview:cogView];
-	cogView.translatesAutoresizingMaskIntoConstraints = false;
-	//cogParentView.translatesAutoresizingMaskIntoConstraints = false;
-	[cogView.centerXAnchor constraintEqualToAnchor:cogParentView.centerXAnchor].active = true;
-	[cogView.centerYAnchor constraintEqualToAnchor:cogParentView.centerYAnchor].active = true;
-	//cogView.frame = CGRectMake(100, 100, 30, 30);
-	[self.blurView.contentView addSubview:cogParentView];
+	self.cogButton = [UIButton buttonWithType:UIButtonTypeCustom];
+	[self.cogButton addTarget:self action:@selector(cogButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+	[self.cogButton setImage:[UIImage imageNamed:@"cog.png" inBundle:[NSBundle bundleWithPath:@"/Library/Application Support/Rofi/Assets.bundle"] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+	self.cogButton.frame = CGRectMake(100, 300, 45, 45);
+	self.cogButton.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.2];
+	self.cogButton.alpha = 0;
+	self.cogButton.clipsToBounds = YES;
+	self.cogButton.layer.cornerRadius = 45.0/2;
+	[self.blurView.contentView addSubview:self.cogButton];
+}
+
+- (void)cogButtonPressed {
+	[self hideView];
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    	[[%c(LSApplicationWorkspace) defaultWorkspace] openSensitiveURL:[NSURL URLWithString:@"prefs:root=Rofi"] withOptions:nil];
+    	NSLog(@"Prefs launched!");
+	});
 }
 
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture {
@@ -280,6 +285,7 @@ unsigned char numberOfIcons;
 			}
 			self.blurView.effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
 			self.shortcutView.center = center;
+			self.cogButton.alpha = 1;
 		}];
 
 	return animator;
@@ -299,6 +305,7 @@ unsigned char numberOfIcons;
 			}
 			self.blurView.effect = nil;
 			self.shortcutView.center = center;
+			self.cogButton.alpha = 0;
 		}];
 
 	return animator;
