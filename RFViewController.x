@@ -6,6 +6,8 @@
 CGPoint longPressStartingPoint;
 UIViewPropertyAnimator *panAnimator;
 NSTimer *timeoutTimer;
+NSLayoutConstraint *cogRightDirectionConstraint;
+NSLayoutConstraint *cogLeftDirectionConstraint;
 HBPreferences *prefs;
 NSInteger numberOfIcons;
 BOOL isRightDirection;
@@ -194,12 +196,27 @@ NSArray *apps;
 	self.cogButton = [UIButton buttonWithType:UIButtonTypeCustom];
 	[self.cogButton addTarget:self action:@selector(cogButtonPressed) forControlEvents:UIControlEventTouchUpInside];
 	[self.cogButton setImage:[UIImage imageNamed:@"cog.png" inBundle:[NSBundle bundleWithPath:@"/Library/Application Support/Rofi/Assets.bundle"] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
-	self.cogButton.frame = CGRectMake(100, 300, 45, 45);
-	self.cogButton.backgroundColor = [UIColor colorWithWhite:0.5 alpha:0.2];
+	//self.cogButton.frame = CGRectMake(100, 300, 45, 45);
+	self.cogButton.frame = CGRectMake(0, 0, 45, 45);
+	self.cogButton.backgroundColor = [UIColor colorWithWhite:1 alpha:0.5];
 	self.cogButton.alpha = 0;
 	self.cogButton.clipsToBounds = YES;
 	self.cogButton.layer.cornerRadius = 45.0/2;
+	self.cogButton.translatesAutoresizingMaskIntoConstraints = false;
 	[self.blurView.contentView addSubview:self.cogButton];
+	[self.cogButton.heightAnchor constraintEqualToConstant:45].active = true;
+	[self.cogButton.widthAnchor constraintEqualToConstant:45].active = true;
+	[self.cogButton.centerYAnchor constraintEqualToAnchor:self.blurView.contentView.bottomAnchor constant:-70].active = true;
+	cogRightDirectionConstraint = [self.cogButton.centerXAnchor constraintEqualToAnchor:self.blurView.contentView.leftAnchor constant:75];
+	cogLeftDirectionConstraint = [self.cogButton.centerXAnchor constraintEqualToAnchor:self.blurView.contentView.rightAnchor constant:-75];
+	if (isRightDirection) {
+		cogLeftDirectionConstraint.active = false;
+		cogRightDirectionConstraint.active = true;
+	}
+	else {
+		cogRightDirectionConstraint.active = false;
+		cogLeftDirectionConstraint.active = true;
+	}
 }
 
 - (void)cogButtonPressed {
@@ -307,6 +324,14 @@ NSArray *apps;
 				}];
 			[prefs setBool:isRightDirection forKey:@"isRightDirection"];
 			[prefs setFloat:self.barView.center.y forKey:@"barViewCenterYPosition"];
+			if (isRightDirection) {
+				cogLeftDirectionConstraint.active = false;
+				cogRightDirectionConstraint.active = true;
+			}
+			else {
+				cogRightDirectionConstraint.active = false;
+				cogLeftDirectionConstraint.active = true;
+			}
 			break;
 		}
 		default:

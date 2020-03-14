@@ -1,9 +1,19 @@
-#include "RFRootListController.h"
+#import "RFRootListController.h"
 #import "SparkAppListTableViewController.h"
 #import "RFAppListController.h"
 #import "SparkAppList.h"
+#import <Cephei/HBRespringController.h>
 
 @implementation RFRootListController
+
+- (id)init {
+    self = [super init];
+    if (self) {
+        UIBarButtonItem *respringButton = [[UIBarButtonItem alloc] initWithTitle:@"Respring" style:UIBarButtonItemStylePlain target:self action:@selector(respring)];
+        self.navigationItem.rightBarButtonItem = respringButton;
+    }
+    return self;
+}
 
 - (NSArray *)specifiers {
 	if (!_specifiers) {
@@ -29,6 +39,8 @@
 }
 
 - (void)respring {
+    NSLog(@"[RF] respring called");
+    [HBRespringController respring];
 }
 
 @end
