@@ -1,6 +1,7 @@
 #import "Tweak.h"
 #import "RFView.h"
 #import "RFViewController.h"
+#import <Cephei/HBPreferences.h>
 
 @interface RFWindow : UIWindow
 @end
@@ -8,6 +9,7 @@
 static RFWindow *window;
 static RFViewController *viewController;
 static UIScreenEdgePanGestureRecognizer *pan;
+static BOOL isEnabled;
 
 %subclass RFWindow : UIWindow
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
@@ -41,6 +43,9 @@ static UIScreenEdgePanGestureRecognizer *pan;
 
 - (void)applicationDidFinishLaunching:(id)application {
 	%orig;
+	if (!isEnabled)
+		return;
+
 	viewController = [RFViewController new];
 	window = [[%c(RFWindow) alloc] initWithFrame:UIScreen.mainScreen.bounds];
 	window.screen = UIScreen.mainScreen;
@@ -62,3 +67,9 @@ static UIScreenEdgePanGestureRecognizer *pan;
 }
 
 %end
+
+%ctor {
+	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:@"com.kef.rofi"];
+	[prefs registerBool:&isEnabled default:YES forKey:@"isEnabled"];
+	NSLog(@"[RF] isEnabled = %@", isEnabled ? @"YES" : @"NO");
+}

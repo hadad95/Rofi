@@ -9,7 +9,6 @@
 
 @interface RFViewController : UIViewController <SBIconViewDelegate, UIGestureRecognizerDelegate, UIScrollViewDelegate>//, SBUIActiveOrientationObserver>
 @property (nonatomic, assign) BOOL isViewVisible;
-@property (nonatomic, assign) BOOL isRightDirection;
 @property (nonatomic, assign) BOOL isDraggingShortcutView;
 @property (nonatomic, assign) CGSize barViewCornerRadiusSize;
 @property (nonatomic, retain) RFView *shortcutView;
@@ -18,7 +17,7 @@
 @property (nonatomic, retain) UIVisualEffectView *blurView;
 @property (nonatomic, retain) UIView *barView;
 @property (nonatomic, retain) UIButton *cogButton;
-@property (nonatomic, retain) UIScreenEdgePanGestureRecognizer *edgePan;
+@property (nonatomic, retain) UIPanGestureRecognizer *edgePan;
 - (SBIconView *)getIconView:(NSString *)identifier;
 - (void)addIconViewToStackView:(NSString *)identifier;
 - (void)cogButtonPressed;

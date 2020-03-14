@@ -34,3 +34,8 @@
 + (id)defaultWorkspace;
 - (bool)openSensitiveURL:(id)arg1 withOptions:(id)arg2;
 @end
+
+@interface NSUserDefaults (private)
+- (id)objectForKey:(NSString *)key inDomain:(NSString *)domain;
+- (void)setObject:(id)value forKey:(NSString *)key inDomain:(NSString *)domain;
+@end
