@@ -10,6 +10,7 @@ HBPreferences *prefs;
 NSInteger numberOfIcons;
 BOOL isRightDirection;
 CGFloat barViewCenterYPosition;
+NSArray *apps;
 
 @implementation RFViewController
 
@@ -17,9 +18,10 @@ CGFloat barViewCenterYPosition;
 	self = [super init];
 	if (self) {
 		prefs = [HBPreferences preferencesForIdentifier:@"com.kef.rofi"];
-		[prefs registerInteger:&numberOfIcons default:4 forKey:@"numberOfIcons"];
-		[prefs registerBool:&isRightDirection default:YES forKey:@"isRightDirection"];
-		[prefs registerFloat:&barViewCenterYPosition default:150 forKey:@"barViewCenterYPosition"];
+		numberOfIcons = [prefs integerForKey:@"numberOfIcons" default:4];
+		isRightDirection = [prefs boolForKey:@"isRightDirection" default:YES];
+		barViewCenterYPosition = [prefs floatForKey:@"barViewCenterYPosition" default:150];
+		apps = (NSArray *)[prefs objectForKey:@"selectedApps" default:[[NSArray alloc] init]];
 	}
 	return self;
 }
@@ -149,14 +151,19 @@ CGFloat barViewCenterYPosition;
     [self addIconViewToStackView:@"com.facebook.Messenger"];
     [self addIconViewToStackView:@"com.burbn.instagram"];
     */
-    
+    /*
     [self addIconViewToStackView:@"com.hammerandchisel.discord"];
     [self addIconViewToStackView:@"com.atebits.Tweetie2"];
     [self addIconViewToStackView:@"com.apple.mobilesafari"];
     [self addIconViewToStackView:@"net.whatsapp.WhatsApp"];
     [self addIconViewToStackView:@"com.burbn.instagram"];
     [self addIconViewToStackView:@"com.toyopagroup.picaboo"];
-    
+    */
+
+    for (NSString *app in apps) {
+    	[self addIconViewToStackView:app];
+    }
+
     CGRect barViewFrame;
     CAShapeLayer *barViewMaskLayer = [CAShapeLayer layer];
     NSLog(@"[RF] barViewCenterYPosition = %f", barViewCenterYPosition);

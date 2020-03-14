@@ -2,9 +2,11 @@
 #import "SparkAppList.h"
 #import "SparkAppItem.h"
 #import <Cephei/HBPreferences.h>
+#import <AppList/AppList.h>
 
 NSMutableArray *userApps;
 NSMutableArray *selectedApps;
+NSDictionary *allApps;
 HBPreferences *prefs;
 
 @implementation RFAppListController
@@ -12,9 +14,16 @@ HBPreferences *prefs;
 - (RFAppListController *)initWithStyle:(UITableViewStyle)style {
 	self = [super initWithStyle:style];
 	if (self) {
-		//selectedApps = [[NSMutableArray alloc] init];
+		selectedApps = [[NSMutableArray alloc] init];
 		prefs = [HBPreferences preferencesForIdentifier:@"com.kef.rofi"];
-		selectedApps = [[SparkAppList getAppListForIdentifier:@"com.kef.rofi" andKey:@"selectedApps"] mutableCopy];
+		//selectedApps = [[SparkAppList getAppListForIdentifier:@"com.kef.rofi" andKey:@"selectedApps"] mutableCopy];
+		NSArray *tempArray;
+		allApps = [[ALApplicationList sharedApplicationList] applicationsFilteredUsingPredicate:[NSPredicate predicateWithFormat:@"isInternalApplication = FALSE"] onlyVisible:YES titleSortedIdentifiers:&tempArray];
+		userApps = [tempArray mutableCopy];
+		selectedApps = [[prefs objectForKey:@"selectedApps" default:[[NSArray alloc] init]] mutableCopy];
+		for (id app in selectedApps) {
+			[userApps removeObject:app];
+		}
 		NSLog(@"[RF] init done");
 	}
 	return self;
@@ -25,8 +34,9 @@ HBPreferences *prefs;
 	[self setEditing:YES animated:NO];
 	self.navigationItem.hidesBackButton = NO;
 	self.title = @"Selected Applications";
-	SparkAppList *appList = [[SparkAppList alloc] init];
-	__weak RFAppListController *weakSelf = self;
+	//SparkAppList *appList = [[SparkAppList alloc] init];
+	//__weak RFAppListController *weakSelf = self;
+	/*
 	[appList getAppList:^(NSArray *args) {
 		userApps = [args mutableCopy];
 		NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
@@ -40,6 +50,7 @@ HBPreferences *prefs;
 		NSLog(@"[RF] block done");
 		[weakSelf.tableView reloadData];
 	}];
+	*/
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -67,12 +78,16 @@ HBPreferences *prefs;
 	if (cell == nil)
     	cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
 	if (indexPath.section == 0) {
-		cell.textLabel.text = ((SparkAppItem *)selectedApps[indexPath.row]).displayName;
-		cell.imageView.image = [(SparkAppItem *)selectedApps[indexPath.row] icon];
+		//cell.textLabel.text = ((SparkAppItem *)selectedApps[indexPath.row]).displayName;
+		//cell.imageView.image = [(SparkAppItem *)selectedApps[indexPath.row] icon];
+		cell.textLabel.text = allApps[selectedApps[indexPath.row]];
+		cell.imageView.image = [[ALApplicationList sharedApplicationList] iconOfSize:ALApplicationIconSizeSmall forDisplayIdentifier:selectedApps[indexPath.row]];
 	}
 	else {
-		cell.textLabel.text = ((SparkAppItem *)userApps[indexPath.row]).displayName;
-		cell.imageView.image = [(SparkAppItem *)userApps[indexPath.row] icon];
+		//cell.textLabel.text = ((SparkAppItem *)userApps[indexPath.row]).displayName;
+		//cell.imageView.image = [(SparkAppItem *)userApps[indexPath.row] icon];
+		cell.textLabel.text = allApps[userApps[indexPath.row]];
+		cell.imageView.image = [[ALApplicationList sharedApplicationList] iconOfSize:ALApplicationIconSizeSmall forDisplayIdentifier:userApps[indexPath.row]];
 	}
 	return cell;
 }
@@ -92,10 +107,11 @@ HBPreferences *prefs;
 	NSLog(@"[RF] moveRowAtIndexPath called, sourceIndexPath = %@, destinationIndexPath = %@", sourceIndexPath, destinationIndexPath);
 	NSLog(@"[RF] source section = %ld, row = %ld, item = %ld", sourceIndexPath.section, sourceIndexPath.row, sourceIndexPath.item);
 	if (sourceIndexPath.section == 0 && destinationIndexPath.section == 0) {
-		SparkAppItem *app = selectedApps[sourceIndexPath.row];
+		id app = selectedApps[sourceIndexPath.row];
 		[selectedApps removeObjectAtIndex:sourceIndexPath.row];
 		[selectedApps insertObject:app atIndex:destinationIndexPath.row];
-		[SparkAppList setAppList:[selectedApps copy] forIdentifier:@"com.kef.rofi" andKey:@"selectedApps"];
+		//[SparkAppList setAppList:[selectedApps copy] forIdentifier:@"com.kef.rofi" andKey:@"selectedApps"];
+		[prefs setObject:[selectedApps copy] forKey:@"selectedApps"];
 	}
 }
 
@@ -116,7 +132,7 @@ HBPreferences *prefs;
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (editingStyle == UITableViewCellEditingStyleInsert) {
-		SparkAppItem *app = userApps[indexPath.row];
+		id app = userApps[indexPath.row];
 		NSLog(@"[RF] app = %@", app);
 		[selectedApps addObject:app];
 		[userApps removeObject:app];
@@ -127,18 +143,20 @@ HBPreferences *prefs;
 		[tableView endUpdates];
 	}
 	else if (editingStyle == UITableViewCellEditingStyleDelete) {
-		SparkAppItem *app = selectedApps[indexPath.row];
+		id app = selectedApps[indexPath.row];
 		[userApps addObject:app];
 		[selectedApps removeObject:app];
-		NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
-		[userApps sortUsingDescriptors:@[sortDescriptor]];
+		//NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
+		//[userApps sortUsingDescriptors:@[sortDescriptor]];
+		userApps = [[userApps sortedArrayUsingComparator: ^(id obj1, id obj2) {
+			return [allApps[obj1] localizedCaseInsensitiveCompare:allApps[obj2]];
+		}] mutableCopy];
 		NSUInteger index = [userApps indexOfObject:app];
 		[tableView beginUpdates];
 		[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationTop];
 		[tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:1]] withRowAnimation:UITableViewRowAnimationTop];
 		[tableView endUpdates];
 	}
-	NSLog(@"[RF] selectedApps.count = %lu", selectedApps.count);
-	[SparkAppList setAppList:[selectedApps copy] forIdentifier:@"com.kef.rofi" andKey:@"selectedApps"];
+	[prefs setObject:[selectedApps copy] forKey:@"selectedApps"];
 }
 @end
