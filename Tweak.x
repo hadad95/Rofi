@@ -69,7 +69,7 @@ static BOOL isEnabled;
 %end
 
 %ctor {
-	HBPreferences *prefs = [[HBPreferences alloc] initWithIdentifier:@"com.kef.rofi"];
+	HBPreferences *prefs = [HBPreferences preferencesForIdentifier:@"com.kef.rofi"];
 	[prefs registerBool:&isEnabled default:YES forKey:@"isEnabled"];
 	NSLog(@"[RF] isEnabled = %@", isEnabled ? @"YES" : @"NO");
 }

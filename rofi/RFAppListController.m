@@ -1,27 +1,22 @@
 #include "RFAppListController.h"
-//#include <AppList/AppList.h>
-#include <Preferences/PSSpecifier.h>
 #import "SparkAppList.h"
 #import "SparkAppItem.h"
+#import <Cephei/HBPreferences.h>
 
 NSMutableArray *userApps;
 NSMutableArray *selectedApps;
+HBPreferences *prefs;
 
 @implementation RFAppListController
 
 - (RFAppListController *)initWithStyle:(UITableViewStyle)style {
 	self = [super initWithStyle:style];
-	selectedApps = [[NSMutableArray alloc] init];
-	SparkAppList *appList = [[SparkAppList alloc] init];
-	__weak RFAppListController *weakSelf = self;
-	[appList getAppList:^(NSArray *args) {
-		userApps = [args mutableCopy];
-		NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
-		[userApps sortUsingDescriptors:@[sortDescriptor]];
-		NSLog(@"[RF] block done");
-		[weakSelf.tableView reloadData];
-	}];
-	NSLog(@"[RF] init done");
+	if (self) {
+		//selectedApps = [[NSMutableArray alloc] init];
+		prefs = [HBPreferences preferencesForIdentifier:@"com.kef.rofi"];
+		selectedApps = [[SparkAppList getAppListForIdentifier:@"com.kef.rofi" andKey:@"selectedApps"] mutableCopy];
+		NSLog(@"[RF] init done");
+	}
 	return self;
 }
 
@@ -30,6 +25,21 @@ NSMutableArray *selectedApps;
 	[self setEditing:YES animated:NO];
 	self.navigationItem.hidesBackButton = NO;
 	self.title = @"Selected Applications";
+	SparkAppList *appList = [[SparkAppList alloc] init];
+	__weak RFAppListController *weakSelf = self;
+	[appList getAppList:^(NSArray *args) {
+		userApps = [args mutableCopy];
+		NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"displayName" ascending:YES];
+		[userApps sortUsingDescriptors:@[sortDescriptor]];
+		NSLog(@"[RF] selectedApps.count = %lu", selectedApps.count);
+		if (selectedApps) {
+			for (id app in selectedApps) {
+				[userApps removeObject:app];
+			}
+		}
+		NSLog(@"[RF] block done");
+		[weakSelf.tableView reloadData];
+	}];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -85,6 +95,7 @@ NSMutableArray *selectedApps;
 		SparkAppItem *app = selectedApps[sourceIndexPath.row];
 		[selectedApps removeObjectAtIndex:sourceIndexPath.row];
 		[selectedApps insertObject:app atIndex:destinationIndexPath.row];
+		[SparkAppList setAppList:[selectedApps copy] forIdentifier:@"com.kef.rofi" andKey:@"selectedApps"];
 	}
 }
 
@@ -127,5 +138,7 @@ NSMutableArray *selectedApps;
 		[tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:1]] withRowAnimation:UITableViewRowAnimationTop];
 		[tableView endUpdates];
 	}
+	NSLog(@"[RF] selectedApps.count = %lu", selectedApps.count);
+	[SparkAppList setAppList:[selectedApps copy] forIdentifier:@"com.kef.rofi" andKey:@"selectedApps"];
 }
 @end
