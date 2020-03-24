@@ -6,6 +6,46 @@
 - (BOOL)isLocked;
 @end
 
+@interface SBSecureWindow : UIWindow
+-(instancetype)initWithScreen:(UIScreen*)screen debugName:(NSString*)debugName rootViewController:(UIViewController*)viewController;
+@end
+
+@interface FBSOpenApplicationOptions : NSObject
++ (id)optionsWithDictionary:(id)arg1;
+@end
+
+@interface FBProcess : NSObject
+@end
+
+@interface FBApplicationProcess : FBProcess
+@end
+
+@interface FBProcessManager : NSObject
++ (id)sharedInstance;
+- (FBApplicationProcess *)systemApplicationProcess;
+@end
+
+@interface FBSystemServiceOpenApplicationRequest : NSObject
+@property (assign,getter=isTrusted,nonatomic) BOOL trusted;
+@property (nonatomic,copy) NSString *bundleIdentifier;
+@property (nonatomic,copy) FBSOpenApplicationOptions *options;
+@property (nonatomic,retain) FBProcess *clientProcess;
++ (id)request;
+@end
+
+@interface FBSystemService : NSObject
++ (id)sharedInstance;
+@end
+
+@interface SBMainWorkspace : NSObject
++ (id)sharedInstance;
+- (void)systemService:(id)arg1 handleOpenApplicationRequest:(id)arg2 withCompletion:(id)arg3 ;
+@end
+
+@interface UIViewController (private)
+- (BOOL)_canShowWhileLocked;
+@end
+
 @interface SBIcon
 - (id)applicationBundleID;
 @end

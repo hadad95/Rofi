@@ -3,7 +3,7 @@
 #import "RFViewController.h"
 #import <Cephei/HBPreferences.h>
 
-@interface RFWindow : UIWindow
+@interface RFWindow : SBSecureWindow
 @end
 
 static RFWindow *window;
@@ -11,7 +11,7 @@ static RFViewController *viewController;
 static UIScreenEdgePanGestureRecognizer *pan;
 static BOOL isEnabled;
 
-%subclass RFWindow : UIWindow
+%subclass RFWindow : SBSecureWindow
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
 	UIView *viewAtPoint = [self.rootViewController.view hitTest:point withEvent:event];
 	BOOL ret;
@@ -47,9 +47,10 @@ static BOOL isEnabled;
 		return;
 
 	viewController = [RFViewController new];
-	window = [[%c(RFWindow) alloc] initWithFrame:UIScreen.mainScreen.bounds];
+	//window = [[%c(RFWindow) alloc] initWithFrame:UIScreen.mainScreen.bounds];
+	window = [[%c(RFWindow) alloc] initWithScreen:UIScreen.mainScreen debugName:@"Rofi" rootViewController:viewController];
 	window.screen = UIScreen.mainScreen;
-	window.rootViewController = viewController;
+	//window.rootViewController = viewController;
 	window.userInteractionEnabled = YES;
 	window.opaque = NO;
 	window.hidden = NO;

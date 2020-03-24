@@ -14,6 +14,24 @@ BOOL isRightDirection;
 CGFloat barViewCenterYPosition;
 NSArray *apps;
 
+void openApplication(NSString* bundleID)
+{
+    FBSOpenApplicationOptions* opts = [%c(FBSOpenApplicationOptions) optionsWithDictionary:@{
+        @"__LaunchOrigin" : @"BulletinDestinationCoverSheet",
+        @"__PromptUnlockDevice" : @YES,
+        @"__UnlockDevice" : @YES,
+        @"__LaunchImage" : @"",
+        @"__Actions" : @[]
+    }];
+    FBSystemServiceOpenApplicationRequest* request = [%c(FBSystemServiceOpenApplicationRequest) request];
+    request.options = opts;
+    request.bundleIdentifier = bundleID;
+    request.trusted = YES;
+    request.clientProcess = [[%c(FBProcessManager) sharedInstance] systemApplicationProcess];
+
+    [[%c(SBMainWorkspace) sharedInstance] systemService:[%c(FBSystemService) sharedInstance] handleOpenApplicationRequest:request withCompletion:^{}];
+}
+
 @implementation RFViewController
 
 - (id)init {
@@ -228,8 +246,11 @@ NSArray *apps;
 }
 
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture {
+	NSLog(@"[RF] handlePan called");
+	/*
 	if ([(SpringBoard *)UIApplication.sharedApplication isLocked])
 		return;
+	*/
 
     CGFloat width = self.shortcutView.frame.size.width;
     // TODO: change the shit out of this
@@ -451,7 +472,8 @@ NSArray *apps;
 - (void)iconTapped:(id)arg1 {
 	[self hideView];
 	NSString *bundleID = [((SBIconView *)arg1).icon applicationBundleID];
-	[[UIApplication sharedApplication] launchApplicationWithIdentifier:bundleID suspended:NO];
+	//[[UIApplication sharedApplication] launchApplicationWithIdentifier:bundleID suspended:NO];
+	openApplication(bundleID);
 }
 
 - (void)blurViewTapped:(id)arg1 {
@@ -497,8 +519,13 @@ NSArray *apps;
 	NSLog(@"[RF] iconViewShouldBeginShortcutsPresentation called");
 	return YES;
 }
+
 - (BOOL)iconView:(id)arg1 shouldActivateApplicationShortcutItem:(id)arg2 atIndex:(unsigned long long)arg3 {
 	NSLog(@"[RF] iconView:shouldActivateApplicationShortcutItematIndex: called");
+	return YES;
+}
+
+- (BOOL)_canShowWhileLocked {
 	return YES;
 }
 
