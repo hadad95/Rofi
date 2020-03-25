@@ -13,6 +13,11 @@ NSInteger numberOfIcons;
 BOOL isRightDirection;
 CGFloat barViewCenterYPosition;
 NSArray *apps;
+BOOL isBarMovable;
+BOOL isBarMoving;
+CGFloat barWidth;
+CGFloat barHeight;
+CGFloat barAlpha;
 
 void openApplication(NSString* bundleID)
 {
@@ -37,11 +42,35 @@ void openApplication(NSString* bundleID)
 - (id)init {
 	self = [super init];
 	if (self) {
+		NSLog(@"[RF] width=%f height=%f", barWidth, barHeight);
+		self.barViewCornerRadiusSize = (CGSize){10, 10};
+
 		prefs = [HBPreferences preferencesForIdentifier:@"com.kef.rofi"];
 		numberOfIcons = [prefs integerForKey:@"numberOfIcons" default:4];
 		isRightDirection = [prefs boolForKey:@"isRightDirection" default:YES];
 		barViewCenterYPosition = [prefs floatForKey:@"barViewCenterYPosition" default:150];
 		apps = (NSArray *)[prefs objectForKey:@"selectedApps" default:[[NSArray alloc] init]];
+
+		[prefs registerBool:&isBarMovable default:YES forKey:@"isBarMovable"];
+		[prefs registerFloat:&barWidth default:10.0 forKey:@"barWidth"];
+		[prefs registerFloat:&barHeight default:100.0 forKey:@"barHeight"];
+		[prefs registerFloat:&barAlpha default:0.5 forKey:@"barAlpha"];
+		[prefs registerPreferenceChangeBlock:^ {
+			CGPoint center;
+			CGRect bounds = UIScreen.mainScreen.bounds;
+			if (isRightDirection) {
+				center = CGPointMake(bounds.size.width - barWidth/2, barViewCenterYPosition);
+			}
+			else {
+				center = CGPointMake(barWidth/2, barViewCenterYPosition);
+			}
+			[UIView animateWithDuration:0.25
+				animations:^ {
+					self.barView.center = center;
+					self.barView.transform = CGAffineTransformScale(self.barView.transform, barWidth / self.barView.frame.size.width, barHeight / self.barView.frame.size.height);
+					self.barView.backgroundColor = [self.barView.backgroundColor colorWithAlphaComponent:barAlpha];
+				}];
+		}];
 	}
 	return self;
 }
@@ -98,7 +127,6 @@ void openApplication(NSString* bundleID)
 	//[UIApplication.sharedApplication performSelector:@selector(addActiveOrientationObserver:) withObject:self];
 
 	//isRightDirection = YES;
-	self.barViewCornerRadiusSize = (CGSize){10, 10};
 	//numberOfIcons = 3;
 
 	SBIconView *tempIconView;
@@ -164,22 +192,6 @@ void openApplication(NSString* bundleID)
     [self.shortcutStackView.topAnchor constraintEqualToAnchor:self.shortcutScrollView.topAnchor].active = true;
     [self.shortcutStackView.bottomAnchor constraintEqualToAnchor:self.shortcutScrollView.bottomAnchor].active = true;
 
-    /*
-    [self addIconViewToStackView:@"com.facebook.Facebook"];
-    [self addIconViewToStackView:@"com.hammerandchisel.discord"];
-    [self addIconViewToStackView:@"net.whatsapp.WhatsApp"];
-    [self addIconViewToStackView:@"com.facebook.Messenger"];
-    [self addIconViewToStackView:@"com.burbn.instagram"];
-    */
-    /*
-    [self addIconViewToStackView:@"com.hammerandchisel.discord"];
-    [self addIconViewToStackView:@"com.atebits.Tweetie2"];
-    [self addIconViewToStackView:@"com.apple.mobilesafari"];
-    [self addIconViewToStackView:@"net.whatsapp.WhatsApp"];
-    [self addIconViewToStackView:@"com.burbn.instagram"];
-    [self addIconViewToStackView:@"com.toyopagroup.picaboo"];
-    */
-
     for (NSString *app in apps) {
     	[self addIconViewToStackView:app];
     }
@@ -188,15 +200,15 @@ void openApplication(NSString* bundleID)
     CAShapeLayer *barViewMaskLayer = [CAShapeLayer layer];
     NSLog(@"[RF] barViewCenterYPosition = %f", barViewCenterYPosition);
     if (isRightDirection) {
-    	barViewFrame = CGRectMake(bounds.size.width - 10, barViewCenterYPosition - 50, 10, 100);
-    	barViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, 10, 100) byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:self.barViewCornerRadiusSize].CGPath;
+    	barViewFrame = CGRectMake(bounds.size.width - barWidth, barViewCenterYPosition - barHeight/2, barWidth, barHeight);
+    	barViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, barWidth, barHeight) byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:self.barViewCornerRadiusSize].CGPath;
     }
     else {
-    	barViewFrame = CGRectMake(0, barViewCenterYPosition - 50, 10, 100);
-    	barViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, 10, 100) byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:self.barViewCornerRadiusSize].CGPath;
+    	barViewFrame = CGRectMake(0, barViewCenterYPosition - barHeight/2, barWidth, barHeight);
+    	barViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, barWidth, barHeight) byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:self.barViewCornerRadiusSize].CGPath;
     }
     self.barView = [[UIView alloc] initWithFrame:barViewFrame];
-    self.barView.backgroundColor = [UIColor colorWithRed:0.6 green:0.67 blue:0.71 alpha:0.5];
+    self.barView.backgroundColor = [UIColor colorWithRed:0.6 green:0.67 blue:0.71 alpha:barAlpha];
 	self.barView.layer.mask = barViewMaskLayer;
     [self.view addSubview:self.barView];
 
@@ -210,7 +222,7 @@ void openApplication(NSString* bundleID)
 	[self.barView addGestureRecognizer:longPress];
 
 	// Cog button
-
+	/*
 	self.cogButton = [UIButton buttonWithType:UIButtonTypeCustom];
 	[self.cogButton addTarget:self action:@selector(cogButtonPressed) forControlEvents:UIControlEventTouchUpInside];
 	[self.cogButton setImage:[UIImage imageNamed:@"cog.png" inBundle:[NSBundle bundleWithPath:@"/Library/Application Support/Rofi/Assets.bundle"] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
@@ -235,8 +247,10 @@ void openApplication(NSString* bundleID)
 		cogRightDirectionConstraint.active = false;
 		cogLeftDirectionConstraint.active = true;
 	}
+	*/
 }
 
+/*
 - (void)cogButtonPressed {
 	[self hideView];
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -244,9 +258,9 @@ void openApplication(NSString* bundleID)
     	NSLog(@"Prefs launched!");
 	});
 }
+*/
 
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture {
-	NSLog(@"[RF] handlePan called");
 	/*
 	if ([(SpringBoard *)UIApplication.sharedApplication isLocked])
 		return;
@@ -280,14 +294,18 @@ void openApplication(NSString* bundleID)
 }
 
 - (void)barViewLongPress:(UILongPressGestureRecognizer *)gesture {
+	if (!isBarMovable && !isBarMoving)
+		return;
+
 	CGPoint point = [gesture locationInView:self.view];
 	switch (gesture.state) {
 		case UIGestureRecognizerStateBegan:
 		{
+			isBarMoving = YES;
 			[UIView animateWithDuration:0.25
 				animations:^ {
 					self.barView.backgroundColor = [self.barView.backgroundColor colorWithAlphaComponent:1];
-					self.barView.transform = CGAffineTransformScale(self.barView.transform, 1.1, 1.1);
+					self.barView.transform = CGAffineTransformScale(self.barView.transform, barWidth / self.barView.frame.size.width * 1.1, barHeight / self.barView.frame.size.height * 1.1);
 				}];
 			break;
 		}
@@ -297,7 +315,7 @@ void openApplication(NSString* bundleID)
 			barCenter.y += point.y - longPressStartingPoint.y;
 			CGRect bounds = UIScreen.mainScreen.bounds;
 			if (point.x >= bounds.size.width / 2 && !isRightDirection) { // moving to the right
-				barCenter.x = bounds.size.width - (self.barView.frame.size.width / 2);
+				barCenter.x = bounds.size.width - (barWidth / 2);
 				CAShapeLayer * maskLayer1 = [CAShapeLayer layer];
 				maskLayer1.path = [UIBezierPath bezierPathWithRoundedRect:self.barView.bounds byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:self.barViewCornerRadiusSize].CGPath;
 				self.barView.layer.mask = maskLayer1;
@@ -315,7 +333,7 @@ void openApplication(NSString* bundleID)
 				self.shortcutView.center = shortcutViewCenter;
 			}
 			else if (point.x < bounds.size.width / 2 && isRightDirection) { // moving to the left
-				barCenter.x = self.barView.frame.size.width / 2;
+				barCenter.x = barWidth / 2;
 				CAShapeLayer *maskLayer1 = [CAShapeLayer layer];
 				maskLayer1.path = [UIBezierPath bezierPathWithRoundedRect:self.barView.bounds byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:self.barViewCornerRadiusSize].CGPath;
 				self.barView.layer.mask = maskLayer1;
@@ -338,10 +356,11 @@ void openApplication(NSString* bundleID)
 		case UIGestureRecognizerStateEnded:
 		{
 			//self.edgePan.edges = isRightDirection ? UIRectEdgeRight : UIRectEdgeLeft;
+			isBarMoving = NO;
 			[UIView animateWithDuration:0.25
 				animations:^ {
-					self.barView.backgroundColor = [self.barView.backgroundColor colorWithAlphaComponent:0.5];
-					self.barView.transform = CGAffineTransformScale(self.barView.transform, 1/1.1, 1/1.1);
+					self.barView.backgroundColor = [self.barView.backgroundColor colorWithAlphaComponent:barAlpha];
+					self.barView.transform = CGAffineTransformScale(self.barView.transform, barWidth / self.barView.frame.size.width, barHeight / self.barView.frame.size.height);
 				}];
 			[prefs setBool:isRightDirection forKey:@"isRightDirection"];
 			[prefs setFloat:self.barView.center.y forKey:@"barViewCenterYPosition"];
@@ -497,7 +516,6 @@ void openApplication(NSString* bundleID)
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-	NSLog(@"scrollViewDidEndDecelerating called");
 	[self startTimeoutTimer];
 }
 

@@ -20,7 +20,7 @@
 @property (nonatomic, retain) UIPanGestureRecognizer *edgePan;
 - (SBIconView *)getIconView:(NSString *)identifier;
 - (void)addIconViewToStackView:(NSString *)identifier;
-- (void)cogButtonPressed;
+//- (void)cogButtonPressed;
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture;
 - (UIViewPropertyAnimator *)showingViewPropertyAnimator;
 - (UIViewPropertyAnimator *)hidingViewPropertyAnimator;

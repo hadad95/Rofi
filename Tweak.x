@@ -2,6 +2,7 @@
 #import "RFView.h"
 #import "RFViewController.h"
 #import <Cephei/HBPreferences.h>
+#import <notify.h>
 
 @interface RFWindow : SBSecureWindow
 @end
@@ -73,4 +74,17 @@ static BOOL isEnabled;
 	HBPreferences *prefs = [HBPreferences preferencesForIdentifier:@"com.kef.rofi"];
 	[prefs registerBool:&isEnabled default:YES forKey:@"isEnabled"];
 	NSLog(@"[RF] isEnabled = %@", isEnabled ? @"YES" : @"NO");
+	int notify_token;
+	// com.apple.iokit.hid.displayStatus state 0 = off, 1 = on
+	// com.apple.springboard.hasBlankedScreen state 0 = on, 1 = off
+	notify_register_dispatch("com.apple.springboard.hasBlankedScreen",
+		&notify_token,
+		dispatch_get_main_queue(),
+		^(int token) {
+			uint64_t state = UINT64_MAX;
+            notify_get_state(token, &state);
+            if (state == 1) {
+            	[viewController hideView];
+            }
+        });
 }

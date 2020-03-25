@@ -78,6 +78,8 @@
 			<string>Slider color</string>
 			<key>key</key>
 			<string>barColor</string>
+			<key>PostNotification</key>
+			<string>com.kef.rofi/ReloadPrefs</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -90,6 +92,8 @@
 			<string>isBarMovable</string>
 			<key>label</key>
 			<string>Movable</string>
+			<key>PostNotification</key>
+			<string>com.kef.rofi/ReloadPrefs</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -103,19 +107,21 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>0</real>
+			<real>100</real>
 			<key>defaults</key>
 			<string>com.kef.rofi</string>
 			<key>key</key>
 			<string>barHeight</string>
 			<key>min</key>
-			<real>0</real>
+			<real>50</real>
 			<key>max</key>
-			<real>1</real>
+			<real>200</real>
 			<key>showValue</key>
 			<false/>
 			<key>isSegmented</key>
 			<false/>
+			<key>PostNotification</key>
+			<string>com.kef.rofi/ReloadPrefs</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -129,19 +135,21 @@
 			<key>cell</key>
 			<string>PSSliderCell</string>
 			<key>default</key>
-			<real>0</real>
+			<real>10</real>
 			<key>defaults</key>
 			<string>com.kef.rofi</string>
 			<key>key</key>
 			<string>barWidth</string>
 			<key>min</key>
-			<real>0</real>
+			<real>5</real>
 			<key>max</key>
-			<real>1</real>
+			<real>20</real>
 			<key>showValue</key>
 			<false/>
 			<key>isSegmented</key>
 			<false/>
+			<key>PostNotification</key>
+			<string>com.kef.rofi/ReloadPrefs</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -168,24 +176,8 @@
 			<false/>
 			<key>isSegmented</key>
 			<false/>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>label</key>
-			<string></string>
-			<key>footerText</key>
-			<string></string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>label</key>
-			<string>Respring</string>
-			<key>defaults</key>
-			<string>com.kef.rofi</string>
-			<key>action</key>
-			<string>respring</string>
+			<key>PostNotification</key>
+			<string>com.kef.rofi/ReloadPrefs</string>
 		</dict>
 	</array>
 	<key>title</key>
