@@ -1,7 +1,5 @@
 #import "RFRootListController.h"
-#import "SparkAppListTableViewController.h"
 #import "RFAppListController.h"
-#import "SparkAppList.h"
 #import <Cephei/HBRespringController.h>
 
 @implementation RFRootListController

@@ -1,6 +1,4 @@
 #include "RFAppListController.h"
-#import "SparkAppList.h"
-#import "SparkAppItem.h"
 #import <Cephei/HBPreferences.h>
 #import <AppList/AppList.h>
 
