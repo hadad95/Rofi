@@ -28,5 +28,6 @@
 - (void)hideViewWithPropertyAnimator:(UIViewPropertyAnimator *)animator;
 - (void)blurViewTapped:(id)arg1;
 - (void)startTimeoutTimer;
+- (void)stopTimeoutTimer;
 - (void)timeoutTimerFired:(NSTimer *)timer;
 @end

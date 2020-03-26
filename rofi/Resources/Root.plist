@@ -79,7 +79,7 @@
 			<key>key</key>
 			<string>barColor</string>
 			<key>PostNotification</key>
-			<string>com.kef.rofi/ReloadPrefs</string>
+			<string>com.kef.rofi/ReloadColor</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -177,6 +177,48 @@
 			<key>isSegmented</key>
 			<false/>
 			<key>PostNotification</key>
+			<string>com.kef.rofi/ReloadPrefs</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Timeout Settings</string>
+			<key>footerText</key>
+			<string>Timeout auto-hides the launcher after a set amount of seconds when no activity is detected.</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.kef.rofi</string>
+			<key>key</key>
+			<string>isTimeoutEnabled</string>
+			<key>label</key>
+			<string>Timeout Enabled</string>
+			<key>PostNotification</key>
+			<string>com.kef.rofi/ReloadPrefs</string>
+		</dict>
+		<dict>
+		    <key>cellClass</key>
+		    <string>HBStepperTableCell</string>
+		    <key>default</key>
+		    <real>15</real>
+		    <key>defaults</key>
+		    <string>com.kef.rofi</string>
+		    <key>key</key>
+		    <string>timeoutDelay</string>
+		    <key>label</key>
+		    <string>Timeout delay: %i</string>
+		    <key>max</key>
+		    <real>999</real>
+		    <key>min</key>
+		    <real>3</real>
+		    <key>singularLabel</key>
+		    <string>Timeout delay: 1</string>
+		    <key>PostNotification</key>
 			<string>com.kef.rofi/ReloadPrefs</string>
 		</dict>
 	</array>

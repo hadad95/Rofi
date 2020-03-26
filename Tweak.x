@@ -70,6 +70,10 @@ static BOOL isEnabled;
 
 %end
 
+void notificationCallback (CFNotificationCenterRef center, void * observer, CFStringRef name, const void * object, CFDictionaryRef userInfo) {
+    NSLog(@"[RF] callback called");
+}
+
 %ctor {
 	HBPreferences *prefs = [HBPreferences preferencesForIdentifier:@"com.kef.rofi"];
 	[prefs registerBool:&isEnabled default:YES forKey:@"isEnabled"];
@@ -87,4 +91,9 @@ static BOOL isEnabled;
             	[viewController hideView];
             }
         });
+
+	CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
+	CFNotificationCenterAddObserver(center, NULL, notificationCallback, 
+                                    CFSTR("com.kef.rofi/ReloadColor"), NULL, 
+                                    CFNotificationSuspensionBehaviorDeliverImmediately);
 }

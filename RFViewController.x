@@ -1,5 +1,6 @@
 #import "RFViewController.h"
 #import <Cephei/HBPreferences.h>
+#import "SparkColourPickerUtils.h"
 
 #define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 
@@ -16,6 +17,9 @@ BOOL isBarMoving;
 CGFloat barWidth;
 CGFloat barHeight;
 CGFloat barAlpha;
+NSString *barColor;
+BOOL isTimeoutEnabled;
+NSInteger timeoutDelay;
 
 void openApplication(NSString* bundleID)
 {
@@ -53,6 +57,9 @@ void openApplication(NSString* bundleID)
 		[prefs registerFloat:&barWidth default:10.0 forKey:@"barWidth"];
 		[prefs registerFloat:&barHeight default:100.0 forKey:@"barHeight"];
 		[prefs registerFloat:&barAlpha default:0.5 forKey:@"barAlpha"];
+		[prefs registerObject:&barColor default:@"#99AAB5" forKey:@"barColor"];
+		[prefs registerBool:&isTimeoutEnabled default:YES forKey:@"isTimeoutEnabled"];
+		[prefs registerInteger:&timeoutDelay default:15 forKey:@"timeoutDelay"];
 		[prefs registerPreferenceChangeBlock:^ {
 			NSLog(@"[RF] registerPreferenceChangeBlock called");
 			CGPoint center;
@@ -324,7 +331,7 @@ void openApplication(NSString* bundleID)
 					self.barView.backgroundColor = [self.barView.backgroundColor colorWithAlphaComponent:barAlpha];
 					self.barView.transform = CGAffineTransformScale(self.barView.transform, barWidth / self.barView.frame.size.width, barHeight / self.barView.frame.size.height);
 				}];
-			
+
 			barViewCenterYPosition = self.barView.center.y;
 			[prefs setFloat:self.barView.center.y forKey:@"barViewCenterYPosition"];
 			[prefs setBool:isRightDirection forKey:@"isRightDirection"];
@@ -397,8 +404,7 @@ void openApplication(NSString* bundleID)
 	if (!self.isViewVisible && !self.isDraggingShortcutView)
 		return;
 
-	if (timeoutTimer != nil && timeoutTimer.valid)
-		[timeoutTimer invalidate];
+	[self stopTimeoutTimer];
 
 	self.isViewVisible = NO;
 	self.isDraggingShortcutView = NO;
@@ -463,10 +469,17 @@ void openApplication(NSString* bundleID)
 }
 
 - (void)startTimeoutTimer {
+	if (!isTimeoutEnabled)
+		return
+
+	[self stopTimeoutTimer];
+
+	timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:timeoutDelay target:self selector:@selector(timeoutTimerFired:) userInfo:nil repeats:NO];
+}
+
+- (void)stopTimeoutTimer {
 	if (timeoutTimer != nil && timeoutTimer.valid)
 		[timeoutTimer invalidate];
-
-	timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:99 target:self selector:@selector(timeoutTimerFired:) userInfo:nil repeats:NO];
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
@@ -479,12 +492,12 @@ void openApplication(NSString* bundleID)
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-	[timeoutTimer invalidate];
+	[self stopTimeoutTimer];
 }
 
 - (void)timeoutTimerFired:(NSTimer *)timer {
 	[self hideView];
-	[timer invalidate];
+	[self stopTimeoutTimer];
 }
 
 - (BOOL)iconViewShouldBeginShortcutsPresentation:(id)arg1 {
