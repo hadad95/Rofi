@@ -73,13 +73,13 @@
 				<string>#99AAB5</string>
 				<key>alpha</key>
 				<false/>
+				<key>PostNotification</key>
+				<string>com.kef.rofi/ReloadPrefs</string>
 			</dict>
 			<key>label</key>
 			<string>Slider color</string>
 			<key>key</key>
 			<string>barColor</string>
-			<key>PostNotification</key>
-			<string>com.kef.rofi/ReloadColor</string>
 		</dict>
 		<dict>
 			<key>cell</key>
