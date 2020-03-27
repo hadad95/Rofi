@@ -63,19 +63,19 @@
 			<string>PSLinkCell</string>
 			<key>cellClass</key>
 			<string>SparkColourPickerCell</string>
+			<key>defaults</key>
+			<string>com.kef.rofi</string>
 			<key>libsparkcolourpicker</key>
 			<dict>
-				<key>defaults</key>
-				<string>com.kef.rofi</string>
 				<key>key</key>
 				<string>barColor</string>
 				<key>fallback</key>
 				<string>#99AAB5</string>
 				<key>alpha</key>
 				<false/>
-				<key>PostNotification</key>
-				<string>com.kef.rofi/ReloadPrefs</string>
 			</dict>
+			<key>PostNotification</key>
+			<string>com.kef.rofi/ReloadPrefs</string>
 			<key>label</key>
 			<string>Slider color</string>
 			<key>key</key>

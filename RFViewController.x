@@ -57,7 +57,7 @@ void openApplication(NSString* bundleID)
 		[prefs registerFloat:&barWidth default:10.0 forKey:@"barWidth"];
 		[prefs registerFloat:&barHeight default:100.0 forKey:@"barHeight"];
 		[prefs registerFloat:&barAlpha default:0.5 forKey:@"barAlpha"];
-		[prefs registerObject:&barColor default:@"#99AAB5:1.00" forKey:@"barColor"];
+		[prefs registerObject:&barColor default:@"#99AAB5" forKey:@"barColor"];
 		[prefs registerBool:&isTimeoutEnabled default:YES forKey:@"isTimeoutEnabled"];
 		[prefs registerInteger:&timeoutDelay default:15 forKey:@"timeoutDelay"];
 		[prefs registerPreferenceChangeBlock:^ {
@@ -70,8 +70,9 @@ void openApplication(NSString* bundleID)
 			else {
 				center = CGPointMake(barWidth/2, barViewCenterYPosition);
 			}
-			UIColor *color = [%c(SparkColourPickerUtils) colourWithString:barColor];
-			NSLog(@"[RF] barColor = %@, color = %@", barColor, color);
+			UIColor *color = [SparkColourPickerUtils colourWithString:barColor withFallback:@"#99AAB5"];
+			//NSLog(@"[RF] user defaults result = %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"barColor" inDomain:@"com.kef.rofi"]);
+			//NSLog(@"[RF] barColor = %@, color = %@", barColor, color);
 			[UIView animateWithDuration:0.25
 				animations:^ {
 					self.barView.center = center;
@@ -216,7 +217,7 @@ void openApplication(NSString* bundleID)
     	barViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, barWidth, barHeight) byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:self.barViewCornerRadiusSize].CGPath;
     }
 
-    UIColor *color = [%c(SparkColourPickerUtils) colourWithString:barColor withFallback:@"#99AAB5"];
+    UIColor *color = [SparkColourPickerUtils colourWithString:barColor withFallback:@"#99AAB5"];
     self.barView = [[UIView alloc] initWithFrame:barViewFrame];
     self.barView.backgroundColor = [color colorWithAlphaComponent:barAlpha];
 	self.barView.layer.mask = barViewMaskLayer;
