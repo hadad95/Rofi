@@ -10,7 +10,7 @@
 @interface RFViewController : UIViewController <SBIconViewDelegate, UIGestureRecognizerDelegate, UIScrollViewDelegate>//, SBUIActiveOrientationObserver>
 @property (nonatomic, assign) BOOL isViewVisible;
 @property (nonatomic, assign) BOOL isDraggingShortcutView;
-@property (nonatomic, assign) CGSize barViewCornerRadiusSize;
+@property (nonatomic, assign) CGFloat barViewCornerRadius;
 @property (nonatomic, retain) RFView *shortcutView;
 @property (nonatomic, retain) UIStackView *shortcutStackView;
 @property (nonatomic, retain) UIScrollView *shortcutScrollView;

@@ -169,7 +169,7 @@
 			<key>key</key>
 			<string>barAlpha</string>
 			<key>min</key>
-			<real>0</real>
+			<real>0.001</real>
 			<key>max</key>
 			<real>1</real>
 			<key>showValue</key>
