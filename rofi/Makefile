@@ -5,7 +5,7 @@ TARGET=iphone:clang:12.4:12.4
 
 BUNDLE_NAME = Rofi
 
-Rofi_FILES = RFRootListController.m RFAppListController.m
+Rofi_FILES = RFRootListController.m RFAppListController.m RFAppearanceSettings.m
 Rofi_INSTALL_PATH = /Library/PreferenceBundles
 Rofi_FRAMEWORKS = UIKit
 Rofi_PRIVATE_FRAMEWORKS = Preferences

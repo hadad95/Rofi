@@ -5,6 +5,25 @@
 	<key>items</key>
 	<array>
 		<dict>
+		    <key>cell</key>
+		    <string>PSGroupCell</string>
+		    <key>headerCellClass</key>
+		    <string>HBPackageNameHeaderCell</string>
+		    <key>packageIdentifier</key>
+		    <string>com.kef.rofi</string>
+		    <key>showVersion</key>
+		    <false/>
+		    <key>titleColor</key>
+			<string>#FFFFFF</string>
+			<key>subtitleColor</key>
+			<string>#FFFFFF</string>
+		    <key>backgroundGradientColors</key>
+		    <array>
+		        <string>#009999</string>
+		        <string>#009999</string>
+		    </array>
+		</dict>
+		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
@@ -27,6 +46,8 @@
 		<dict>
 	        <key>cell</key>
 	        <string>PSButtonCell</string>
+	        <key>cellClass</key>
+    		<string>HBTintedTableCell</string>
 	        <key>label</key>
 	        <string>Selected Applications</string>
 	        <key>action</key>
@@ -220,6 +241,18 @@
 		    <string>Timeout delay: 1</string>
 		    <key>PostNotification</key>
 			<string>com.kef.rofi/ReloadPrefs</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+		</dict>
+		<dict>
+		    <key>cellClass</key>
+		    <string>HBTwitterCell</string>
+		    <key>label</key>
+		    <string>Kef</string>
+		    <key>user</key>
+		    <string>theonlykef</string>
 		</dict>
 	</array>
 	<key>title</key>

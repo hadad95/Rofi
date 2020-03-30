@@ -1,6 +1,6 @@
 #import <CepheiPrefs/HBRootListController.h>
-#import <CepheiPrefs/HBAppearanceSettings.h>
 #import <Cephei/HBRespringController.h>
+#import "RFAppearanceSettings.h"
 #import "RFAppListController.h"
 
 @interface RFRootListController : HBRootListController

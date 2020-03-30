@@ -8,7 +8,8 @@
         UIBarButtonItem *respringButton = [[UIBarButtonItem alloc] initWithTitle:@"Respring" style:UIBarButtonItemStylePlain target:self action:@selector(respring)];
         self.navigationItem.rightBarButtonItem = respringButton;
 
-        HBAppearanceSettings *appearanceSettings = [[HBAppearanceSettings alloc] init];
+        RFAppearanceSettings *appearanceSettings = [[RFAppearanceSettings alloc] init];
+        appearanceSettings.tintColor = [UIColor colorWithRed:0.00 green:0.60 blue:0.60 alpha:1.00];
         self.hb_appearanceSettings = appearanceSettings;
     }
     return self;
