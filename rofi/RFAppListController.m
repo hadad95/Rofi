@@ -31,7 +31,7 @@ HBPreferences *prefs;
 	[super viewDidLoad];
 	[self setEditing:YES animated:NO];
 	self.navigationItem.hidesBackButton = NO;
-	self.title = @"Selected Applications";
+	self.title = @"Select Applications";
 	//SparkAppList *appList = [[SparkAppList alloc] init];
 	//__weak RFAppListController *weakSelf = self;
 	/*

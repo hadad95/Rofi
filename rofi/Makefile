@@ -1,7 +1,7 @@
 include $(THEOS)/makefiles/common.mk
 
 ARCHS=arm64 arm64e
-TARGET=iphone:clang:12.4:12.4
+TARGET=iphone:clang:12.4:12.0
 
 BUNDLE_NAME = Rofi
 

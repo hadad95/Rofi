@@ -49,7 +49,7 @@
 	        <key>cellClass</key>
     		<string>HBTintedTableCell</string>
 	        <key>label</key>
-	        <string>Selected Applications</string>
+	        <string>Select Applications...</string>
 	        <key>action</key>
 	        <string>selectApps</string>
 	    </dict>
