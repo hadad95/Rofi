@@ -1,14 +1,15 @@
 #import "RFRootListController.h"
-#import "RFAppListController.h"
-#import <Cephei/HBRespringController.h>
 
 @implementation RFRootListController
 
-- (id)init {
+- (instancetype)init {
     self = [super init];
     if (self) {
         UIBarButtonItem *respringButton = [[UIBarButtonItem alloc] initWithTitle:@"Respring" style:UIBarButtonItemStylePlain target:self action:@selector(respring)];
         self.navigationItem.rightBarButtonItem = respringButton;
+
+        HBAppearanceSettings *appearanceSettings = [[HBAppearanceSettings alloc] init];
+        self.hb_appearanceSettings = appearanceSettings;
     }
     return self;
 }

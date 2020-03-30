@@ -137,20 +137,29 @@ void openApplication(NSString* bundleID)
 		//iconView.delegate = [((SBIconController *)[%c(SBIconController) sharedInstance]) iconManager];
 	}
 	iconView.icon = icon;
-	iconView.delegate = self;
+	//iconView.delegate = self;
+	//iconView.frame = CGRectMake(0, 0, iconView.frame.size.width, iconView.frame.size.height + 10);
 	return iconView;
 }
 
-- (void)addIconViewToStackView:(NSString *)identifier {
+- (void)addIconView:(NSString *)identifier toStackView:(UIStackView *)stackView {
 	SBIconView *iconView = [self getIconView:identifier];
 	if (iconView == nil)
 		return;
 
-	CGFloat iconWidth = iconView.frame.size.width;
-	CGFloat iconHeight = iconView.frame.size.height;
-	[self.shortcutStackView addArrangedSubview:iconView];
-	[iconView.widthAnchor constraintEqualToConstant:iconWidth].active = true;
-    [iconView.heightAnchor constraintEqualToConstant:iconHeight].active = true;
+	//CGFloat iconWidth = iconView.frame.size.width;
+	//CGFloat iconHeight = iconView.frame.size.height;
+	UIView *imageView = [iconView _iconImageView];
+	CGFloat iconWidth = imageView.frame.size.width;
+	CGFloat iconHeight = imageView.frame.size.height;
+	[stackView addArrangedSubview:imageView];
+	//[iconView.widthAnchor constraintEqualToConstant:iconWidth].active = true;
+    //[iconView.heightAnchor constraintEqualToConstant:iconHeight].active = true;
+    [imageView.widthAnchor constraintEqualToConstant:iconWidth].active = true;
+    [imageView.heightAnchor constraintEqualToConstant:iconHeight].active = true;
+    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(iconTapped:)];
+	[imageView addGestureRecognizer:tapRecognizer];
+	imageView.userInteractionEnabled = YES;
 }
 
 - (void)viewDidLoad {
@@ -166,6 +175,7 @@ void openApplication(NSString* bundleID)
 	//isRightDirection = YES;
 	//numberOfIcons = 3;
 
+	/*
 	SBIconView *tempIconView;
 	if (SYSTEM_VERSION_LESS_THAN(@"13")) {
 		tempIconView = [[%c(SBIconView) alloc] initWithContentType:0];
@@ -173,12 +183,20 @@ void openApplication(NSString* bundleID)
 	else {
 		tempIconView = [[%c(SBIconView) alloc] initWithConfigurationOptions:0];
 	}
+	//SBIcon *icon = [((SBIconController *)[%c(SBIconController) sharedInstance]).model expectedIconForDisplayIdentifier:@"com.apple.Preferences"];
+	//tempIconView.icon = icon;
 
-	CGFloat shortcutViewWidth = tempIconView.frame.size.width + 20;
+	NSLog(@"[RF] icon height = %f", tempIconView.frame.size.height);
+	*/
+
+	CGSize iconSize = [%c(SBIconView) defaultIconImageSize];
+
+	CGFloat shortcutViewWidth = iconSize.width + 20;
 	CGFloat shortcutStackViewSpacing = 20;
-	CGFloat shortcutStackViewMarginTop = 10;
-	CGFloat shortcutStackViewMarginBottom = 20;
-	CGFloat shortcutViewHeight = tempIconView.frame.size.height * numberOfIcons + (numberOfIcons - 1) * shortcutStackViewSpacing + shortcutStackViewMarginTop + shortcutStackViewMarginBottom;
+	CGFloat shortcutStackViewMarginTop = shortcutStackViewSpacing / 2;
+	CGFloat shortcutStackViewMarginBottom = shortcutStackViewMarginTop;
+	//CGFloat shortcutViewHeight = (tempIconView.frame.size.height + 10) * numberOfIcons + (numberOfIcons - 1) * shortcutStackViewSpacing + shortcutStackViewMarginTop + shortcutStackViewMarginBottom;
+	CGFloat shortcutViewHeight = iconSize.height * numberOfIcons + numberOfIcons * shortcutStackViewSpacing;
 
 	CGRect bounds = [[UIScreen mainScreen] bounds];
 	//CGFloat ratio = 0.7;
@@ -210,8 +228,8 @@ void openApplication(NSString* bundleID)
 
 	self.shortcutStackView = [[UIStackView alloc] init];
 	self.shortcutStackView.axis = UILayoutConstraintAxisVertical;
-	self.shortcutStackView.distribution = UIStackViewDistributionFillProportionally;
-	self.shortcutStackView.alignment = UIStackViewAlignmentCenter;
+	self.shortcutStackView.distribution = UIStackViewDistributionEqualSpacing;
+	self.shortcutStackView.alignment = UIStackViewAlignmentLeading;
 	self.shortcutStackView.spacing = shortcutStackViewSpacing;
 	self.shortcutStackView.layoutMarginsRelativeArrangement = YES;
 	self.shortcutStackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(shortcutStackViewMarginTop, 0, shortcutStackViewMarginBottom, 0);
@@ -230,7 +248,8 @@ void openApplication(NSString* bundleID)
     [self.shortcutStackView.bottomAnchor constraintEqualToAnchor:self.shortcutScrollView.bottomAnchor].active = true;
 
     for (NSString *app in apps) {
-    	[self addIconViewToStackView:app];
+    	[self addIconView:app toStackView:self.shortcutStackView];
+    	NSLog(@"[RF] icon frame = %@", NSStringFromCGRect(self.shortcutStackView.arrangedSubviews[0].frame));
     }
 
     UIColor *color = [SparkColourPickerUtils colourWithString:barColor withFallback:@"#99AAB5"];
@@ -499,10 +518,11 @@ void openApplication(NSString* bundleID)
 	[animator startAnimation];
 }
 
-- (void)iconTapped:(id)arg1 {
+- (void)iconTapped:(UITapGestureRecognizer *)arg1 {
 	[self hideView];
-	NSString *bundleID = [((SBIconView *)arg1).icon applicationBundleID];
+	//NSString *bundleID = [((SBIconView *)arg1).icon applicationBundleID];
 	//[[UIApplication sharedApplication] launchApplicationWithIdentifier:bundleID suspended:NO];
+	NSString *bundleID = [((SBIconImageView *)arg1.view).icon applicationBundleID];
 	openApplication(bundleID);
 }
 

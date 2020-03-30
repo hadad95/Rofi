@@ -59,11 +59,18 @@
 + (SBIconController *)sharedInstance;
 @end
 
+@interface SBIconImageView : UIImageView
+@property (nonatomic,readonly) SBIcon * icon;
+@end
+
 @interface SBIconView : UIView
 @property(retain, nonatomic) SBIcon *icon;
+@property (nonatomic,readonly) UIView *labelView;
 @property(nonatomic) __weak id delegate;
++ (CGSize)defaultIconImageSize;
 - (id)initWithContentType:(NSUInteger)arg1; // ios 12
 - (id)initWithConfigurationOptions:(NSUInteger)arg1; // ios 13
+- (SBIconImageView *)_iconImageView;
 @end
 
 @interface UIApplication (Private)

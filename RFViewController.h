@@ -18,7 +18,7 @@
 @property (nonatomic, retain) UIView *barView;
 @property (nonatomic, retain) UIPanGestureRecognizer *edgePan;
 - (SBIconView *)getIconView:(NSString *)identifier;
-- (void)addIconViewToStackView:(NSString *)identifier;
+- (void)addIconView:(NSString *)identifier toStackView:(UIStackView *)stackView;
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture;
 - (UIViewPropertyAnimator *)showingViewPropertyAnimator;
 - (UIViewPropertyAnimator *)hidingViewPropertyAnimator;
