@@ -189,7 +189,7 @@ void openApplication(NSString* bundleID)
 	NSLog(@"[RF] icon height = %f", tempIconView.frame.size.height);
 	*/
 
-	CGSize iconSize = [%c(SBIconView) defaultIconImageSize];
+	CGSize iconSize = [[self getIconView:@"com.apple.Preferences"] _iconImageView].frame.size;
 
 	CGFloat shortcutViewWidth = iconSize.width + 20;
 	CGFloat shortcutStackViewSpacing = 20;
