@@ -147,14 +147,10 @@ void openApplication(NSString* bundleID)
 	if (iconView == nil)
 		return;
 
-	//CGFloat iconWidth = iconView.frame.size.width;
-	//CGFloat iconHeight = iconView.frame.size.height;
 	UIView *imageView = [iconView _iconImageView];
 	CGFloat iconWidth = imageView.frame.size.width;
 	CGFloat iconHeight = imageView.frame.size.height;
 	[stackView addArrangedSubview:imageView];
-	//[iconView.widthAnchor constraintEqualToConstant:iconWidth].active = true;
-    //[iconView.heightAnchor constraintEqualToConstant:iconHeight].active = true;
     [imageView.widthAnchor constraintEqualToConstant:iconWidth].active = true;
     [imageView.heightAnchor constraintEqualToConstant:iconHeight].active = true;
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(iconTapped:)];
@@ -165,41 +161,15 @@ void openApplication(NSString* bundleID)
 - (void)viewDidLoad {
 	[super viewDidLoad];
 
-	/*	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showView) name:@"com.kef.test/showview" object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideView) name:@"com.kef.test/hideview" object:nil];
-	*/
-
-	//[UIApplication.sharedApplication performSelector:@selector(addActiveOrientationObserver:) withObject:self];
-
-	//isRightDirection = YES;
-	//numberOfIcons = 3;
-
-	/*
-	SBIconView *tempIconView;
-	if (SYSTEM_VERSION_LESS_THAN(@"13")) {
-		tempIconView = [[%c(SBIconView) alloc] initWithContentType:0];
-	}
-	else {
-		tempIconView = [[%c(SBIconView) alloc] initWithConfigurationOptions:0];
-	}
-	//SBIcon *icon = [((SBIconController *)[%c(SBIconController) sharedInstance]).model expectedIconForDisplayIdentifier:@"com.apple.Preferences"];
-	//tempIconView.icon = icon;
-
-	NSLog(@"[RF] icon height = %f", tempIconView.frame.size.height);
-	*/
-
 	CGSize iconSize = [[self getIconView:@"com.apple.Preferences"] _iconImageView].frame.size;
 
 	CGFloat shortcutViewWidth = iconSize.width + 20;
 	CGFloat shortcutStackViewSpacing = 20;
 	CGFloat shortcutStackViewMarginTop = shortcutStackViewSpacing / 2;
 	CGFloat shortcutStackViewMarginBottom = shortcutStackViewMarginTop;
-	//CGFloat shortcutViewHeight = (tempIconView.frame.size.height + 10) * numberOfIcons + (numberOfIcons - 1) * shortcutStackViewSpacing + shortcutStackViewMarginTop + shortcutStackViewMarginBottom;
 	CGFloat shortcutViewHeight = iconSize.height * numberOfIcons + numberOfIcons * shortcutStackViewSpacing;
 
 	CGRect bounds = [[UIScreen mainScreen] bounds];
-	//CGFloat ratio = 0.7;
 
 	CGRect shortcutViewFrame;
 	CAShapeLayer *shortcutViewMaskLayer = [CAShapeLayer layer];
@@ -258,14 +228,11 @@ void openApplication(NSString* bundleID)
 	self.barView.translatesAutoresizingMaskIntoConstraints = false;
     [self.view addSubview:self.barView];
 
-    //CAShapeLayer *barViewMaskLayer = [CAShapeLayer layer];
     NSLog(@"[RF] barViewCenterYPosition = %f", barViewCenterYPosition);
     if (isRightDirection) {
-    	//barViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, barWidth, barHeight) byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:self.barViewCornerRadiusSize].CGPath;
     	barViewCenterXConstraint = [self.barView.centerXAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:bounds.size.width];
     }
     else {
-    	//barViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, barWidth, barHeight) byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:self.barViewCornerRadiusSize].CGPath;
     	barViewCenterXConstraint = [self.barView.centerXAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:0];
     }
     //self.barView.layer.mask = barViewMaskLayer;
@@ -281,7 +248,6 @@ void openApplication(NSString* bundleID)
     barViewHeightConstraint.active = true;
 
     self.edgePan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-    //self.edgePan.edges = isRightDirection ? UIRectEdgeRight : UIRectEdgeLeft;
 	self.edgePan.delegate = self;
 	[self.barView addGestureRecognizer:self.edgePan];
 
@@ -291,11 +257,6 @@ void openApplication(NSString* bundleID)
 }
 
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture {
-	/*
-	if ([(SpringBoard *)UIApplication.sharedApplication isLocked])
-		return;
-	*/
-
     CGFloat width = self.shortcutView.frame.size.width;
     // TODO: change the shit out of this
     CGFloat percent = MAX(pow(-1, (int)isRightDirection) * [gesture translationInView:gesture.view ].x, 0)/width;
@@ -336,7 +297,6 @@ void openApplication(NSString* bundleID)
 			[UIView animateWithDuration:0.25
 				animations:^ {
 					self.barView.backgroundColor = [self.barView.backgroundColor colorWithAlphaComponent:1];
-					//self.barView.transform = CGAffineTransformScale(self.barView.transform, 2*barWidth / self.barView.frame.size.width * 1.1, barHeight / self.barView.frame.size.height * 1.1);
 					barViewHeightConstraint.constant = barHeight + 10;
 					[self.view layoutIfNeeded];
 				}];
@@ -349,9 +309,6 @@ void openApplication(NSString* bundleID)
 			CGRect bounds = UIScreen.mainScreen.bounds;
 			if (point.x >= bounds.size.width / 2 && !isRightDirection) { // moving to the right
 				barCenter.x = bounds.size.width;
-				//CAShapeLayer * maskLayer1 = [CAShapeLayer layer];
-				//maskLayer1.path = [UIBezierPath bezierPathWithRoundedRect:self.barView.bounds byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:self.barViewCornerRadiusSize].CGPath;
-				//self.barView.layer.mask = maskLayer1;
 				CAShapeLayer * maskLayer2 = [CAShapeLayer layer];
 				maskLayer2.path = [UIBezierPath bezierPathWithRoundedRect: self.shortcutView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii: (CGSize){10.0, 10.0}].CGPath;
 				self.shortcutView.layer.mask = maskLayer2;
@@ -367,9 +324,6 @@ void openApplication(NSString* bundleID)
 			}
 			else if (point.x < bounds.size.width / 2 && isRightDirection) { // moving to the left
 				barCenter.x = 0;
-				//CAShapeLayer *maskLayer1 = [CAShapeLayer layer];
-				//maskLayer1.path = [UIBezierPath bezierPathWithRoundedRect:self.barView.bounds byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:self.barViewCornerRadiusSize].CGPath;
-				//self.barView.layer.mask = maskLayer1;
 				CAShapeLayer * maskLayer2 = [CAShapeLayer layer];
 				maskLayer2.path = [UIBezierPath bezierPathWithRoundedRect: self.shortcutView.bounds byRoundingCorners: UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii: (CGSize){10.0, 10.0}].CGPath;
 				self.shortcutView.layer.mask = maskLayer2;
@@ -383,21 +337,17 @@ void openApplication(NSString* bundleID)
 				}
 				self.shortcutView.center = shortcutViewCenter;
 			} 
-			//self.barView.center = barCenter;
 			barViewCenterXConstraint.constant = barCenter.x;
 			barViewCenterYConstraint.constant = barCenter.y;
-			//[self.view layoutIfNeeded];
 
 			break;
 		}
 		case UIGestureRecognizerStateEnded:
 		{
-			//self.edgePan.edges = isRightDirection ? UIRectEdgeRight : UIRectEdgeLeft;
 			isBarMoving = NO;
 			[UIView animateWithDuration:0.25
 				animations:^ {
 					self.barView.backgroundColor = [self.barView.backgroundColor colorWithAlphaComponent:barAlpha];
-					//self.barView.transform = CGAffineTransformScale(self.barView.transform, 2*barWidth / self.barView.frame.size.width, barHeight / self.barView.frame.size.height);
 					barViewHeightConstraint.constant = barHeight - 10;
 					[self.view layoutIfNeeded];
 				}];
@@ -520,23 +470,12 @@ void openApplication(NSString* bundleID)
 
 - (void)iconTapped:(UITapGestureRecognizer *)arg1 {
 	[self hideView];
-	//NSString *bundleID = [((SBIconView *)arg1).icon applicationBundleID];
-	//[[UIApplication sharedApplication] launchApplicationWithIdentifier:bundleID suspended:NO];
 	NSString *bundleID = [((SBIconImageView *)arg1.view).icon applicationBundleID];
 	openApplication(bundleID);
 }
 
 - (void)blurViewTapped:(id)arg1 {
 	[self hideView];
-	/*
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		[[%c(LSApplicationWorkspace) defaultWorkspace] openSensitiveURL:[NSURL URLWithString:@"prefs:root=Rofi"] withOptions:nil];
-	});
-	*/
-}
-
-- (BOOL)iconViewCanBeginDrags:(id)arg1 {
-	return NO;
 }
 
 - (void)startTimeoutTimer {
@@ -571,23 +510,7 @@ void openApplication(NSString* bundleID)
 	[self stopTimeoutTimer];
 }
 
-- (BOOL)iconViewShouldBeginShortcutsPresentation:(id)arg1 {
-	NSLog(@"[RF] iconViewShouldBeginShortcutsPresentation called");
-	return YES;
-}
-
-- (BOOL)iconView:(id)arg1 shouldActivateApplicationShortcutItem:(id)arg2 atIndex:(unsigned long long)arg3 {
-	NSLog(@"[RF] iconView:shouldActivateApplicationShortcutItematIndex: called");
-	return YES;
-}
-
 - (BOOL)_canShowWhileLocked {
 	return YES;
 }
-
-/*
-- (void)activeInterfaceOrientationDidChangeToOrientation:(long long)arg1 willAnimateWithDuration:(double)arg2 fromOrientation:(long long)arg3 {}
-
-- (void)activeInterfaceOrientationWillChangeToOrientation:(long long)arg1 {}
-*/
 @end

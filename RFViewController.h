@@ -2,12 +2,7 @@
 #import "SBIconViewDelegate.h"
 #import "Tweak.h"
 
-@protocol SBUIActiveOrientationObserver <NSObject>
-- (void)activeInterfaceOrientationDidChangeToOrientation:(long long)arg1 willAnimateWithDuration:(double)arg2 fromOrientation:(long long)arg3;
-- (void)activeInterfaceOrientationWillChangeToOrientation:(long long)arg1;
-@end
-
-@interface RFViewController : UIViewController <SBIconViewDelegate, UIGestureRecognizerDelegate, UIScrollViewDelegate>//, SBUIActiveOrientationObserver>
+@interface RFViewController : UIViewController <UIGestureRecognizerDelegate, UIScrollViewDelegate>
 @property (nonatomic, assign) BOOL isViewVisible;
 @property (nonatomic, assign) BOOL isDraggingShortcutView;
 @property (nonatomic, assign) CGFloat barViewCornerRadius;
