@@ -52,10 +52,11 @@ void openApplication(NSString* bundleID)
 		self.barViewCornerRadius = 10;
 
 		prefs = [HBPreferences preferencesForIdentifier:@"com.kef.rofi"];
-		numberOfIcons = [prefs integerForKey:@"numberOfIcons" default:4];
-		isRightDirection = [prefs boolForKey:@"isRightDirection" default:YES];
-		barViewCenterYPosition = [prefs floatForKey:@"barViewCenterYPosition" default:150];
+		//numberOfIcons = [prefs integerForKey:@"numberOfIcons" default:4];
+		isRightDirection = [prefs boolForKey:@"isRightDirection" default:NO];
+		barViewCenterYPosition = [prefs floatForKey:@"barViewCenterYPosition" default:UIScreen.mainScreen.bounds.size.height/2];
 		apps = (NSArray *)[prefs objectForKey:@"selectedApps" default:[[NSArray alloc] init]];
+		numberOfIcons = apps.count;
 
 		[prefs registerBool:&isBarMovable default:YES forKey:@"isBarMovable"];
 		[prefs registerFloat:&barWidth default:10.0 forKey:@"barWidth"];
@@ -188,7 +189,7 @@ void openApplication(NSString* bundleID)
 	self.shortcutScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.shortcutView.frame.size.width, self.shortcutView.frame.size.height)];
 	self.shortcutScrollView.translatesAutoresizingMaskIntoConstraints = false;
 	self.shortcutScrollView.showsVerticalScrollIndicator = NO;
-	self.shortcutScrollView.pagingEnabled = YES;
+	//self.shortcutScrollView.pagingEnabled = YES;
 	self.shortcutScrollView.delegate = self;
 
 	self.blurView = [[UIVisualEffectView alloc] initWithEffect:nil];

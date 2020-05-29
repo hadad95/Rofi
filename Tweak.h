@@ -4,6 +4,8 @@
 - (BOOL)_handlePhysicalButtonEvent:(UIPressesEvent *)arg1;
 - (void)applicationDidFinishLaunching:(id)application;
 - (BOOL)isLocked;
+- (void)takeScreenshot;
+- (void)screenCapturer:(id)arg1 didCaptureScreenshotsOfScreens:(id)arg2;
 @end
 
 @interface SBSecureWindow : UIWindow

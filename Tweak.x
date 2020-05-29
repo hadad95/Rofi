@@ -11,6 +11,7 @@ static RFWindow *window;
 static RFViewController *viewController;
 static UIScreenEdgePanGestureRecognizer *pan;
 static BOOL isEnabled;
+static BOOL hideWhenTakingScreenshots;
 
 %subclass RFWindow : SBSecureWindow
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
@@ -68,11 +69,28 @@ static BOOL isEnabled;
 	*/
 }
 
+- (void)takeScreenshot {
+	NSLog(@"[RF] takeScreenshot called!");
+	if (hideWhenTakingScreenshots)
+		viewController.barView.alpha = 0;
+	
+	%orig;
+}
+
+- (void)screenCapturer:(id)arg1 didCaptureScreenshotsOfScreens:(id)arg2 {
+	NSLog(@"[RF] takeScreenshot called!");
+	if (hideWhenTakingScreenshots)
+		viewController.barView.alpha = 1;
+	
+	%orig;
+}
+
 %end
 
 %ctor {
 	HBPreferences *prefs = [HBPreferences preferencesForIdentifier:@"com.kef.rofi"];
-	[prefs registerBool:&isEnabled default:YES forKey:@"isEnabled"];
+	isEnabled = [prefs boolForKey:@"isEnabled" default:YES];
+	[prefs registerBool:&hideWhenTakingScreenshots default:NO forKey:@"hideWhenTakingScreenshots"];
 	NSLog(@"[RF] isEnabled = %@", isEnabled ? @"YES" : @"NO");
 	int notify_token;
 	// com.apple.iokit.hid.displayStatus state 0 = off, 1 = on

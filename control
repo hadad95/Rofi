@@ -1,6 +1,6 @@
 Package: com.kef.rofi
 Name: Rofi
-Depends: mobilesubstrate, com.spark.libsparkcolourpicker (>=0.0.26), ws.hbang.common (>= 1.11), applist
+Depends: mobilesubstrate, com.spark.libsparkcolourpicker (>=0.0.26), ws.hbang.common (>= 1.11), applist, preferenceloader
 Version: 1.0.0
 Architecture: iphoneos-arm
 Description: A shortcut app launcher tweak.
