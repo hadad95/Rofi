@@ -1,3 +1,5 @@
+@import UIKit;
+
 #import "SBIconViewDelegate.h"
 
 @interface SpringBoard
@@ -44,12 +46,13 @@
 - (void)systemService:(id)arg1 handleOpenApplicationRequest:(id)arg2 withCompletion:(id)arg3 ;
 @end
 
-@interface UIViewController (private)
+@interface UIViewController (Private)
 - (BOOL)_canShowWhileLocked;
 @end
 
 @interface SBIcon
 - (id)applicationBundleID;
+- (void)setBadge:(UIView *)arg1;
 @end
 
 @interface SBIconModel
@@ -65,6 +68,10 @@
 @property (nonatomic,readonly) SBIcon * icon;
 @end
 
+@interface SBIconBadgeView : UIView
+- (void)configureForIcon:(id)arg1 infoProvider:(id)arg2;
+@end
+
 @interface SBIconView : UIView
 @property(retain, nonatomic) SBIcon *icon;
 @property (nonatomic,readonly) UIView *labelView;
@@ -73,6 +80,8 @@
 - (id)initWithContentType:(NSUInteger)arg1; // ios 12
 - (id)initWithConfigurationOptions:(NSUInteger)arg1; // ios 13
 - (SBIconImageView *)_iconImageView;
+- (void)_updateAccessoryViewWithAnimation:(BOOL)arg1;
+- (CGPoint)_centerForAccessoryView;
 @end
 
 @interface UIApplication (Private)
@@ -83,8 +92,9 @@
 + (id)defaultWorkspace;
 - (bool)openSensitiveURL:(id)arg1 withOptions:(id)arg2;
 @end
-
+/*
 @interface NSUserDefaults (private)
 - (id)objectForKey:(NSString *)key inDomain:(NSString *)domain;
 - (void)setObject:(id)value forKey:(NSString *)key inDomain:(NSString *)domain;
 @end
+*/

@@ -149,6 +149,10 @@ void openApplication(NSString* bundleID)
 		return;
 
 	UIView *imageView = [iconView _iconImageView];
+	for (UIView *subview in imageView.subviews) { // removing notification badges (iOS 13)
+		[subview removeFromSuperview];
+	}
+	imageView.insetsLayoutMarginsFromSafeArea = NO;
 	CGFloat iconWidth = imageView.frame.size.width;
 	CGFloat iconHeight = imageView.frame.size.height;
 	[stackView addArrangedSubview:imageView];
@@ -157,6 +161,16 @@ void openApplication(NSString* bundleID)
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(iconTapped:)];
 	[imageView addGestureRecognizer:tapRecognizer];
 	imageView.userInteractionEnabled = YES;
+}
+
+- (CGFloat)shortcutViewCenterYPositionWithHeight:(CGFloat)shortcutViewHeight {
+	CGRect bounds = UIScreen.mainScreen.bounds;
+	if (barViewCenterYPosition + (shortcutViewHeight / 2) > bounds.size.height)
+		return bounds.size.height - shortcutViewHeight / 2;
+	else if (barViewCenterYPosition - (shortcutViewHeight / 2) < 0)
+		return shortcutViewHeight / 2;
+	else
+		return barViewCenterYPosition;
 }
 
 - (void)viewDidLoad {
@@ -175,22 +189,25 @@ void openApplication(NSString* bundleID)
 	CGRect shortcutViewFrame;
 	CAShapeLayer *shortcutViewMaskLayer = [CAShapeLayer layer];
     if (isRightDirection) {
-    	shortcutViewFrame = CGRectMake(bounds.size.width, (bounds.size.height - shortcutViewHeight) / 2, shortcutViewWidth, shortcutViewHeight);
+    	shortcutViewFrame = CGRectMake(bounds.size.width, [self shortcutViewCenterYPositionWithHeight:shortcutViewHeight] - shortcutViewHeight / 2, shortcutViewWidth, shortcutViewHeight);
     	shortcutViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, shortcutViewWidth, shortcutViewHeight) byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:(CGSize){10.0, 10.0}].CGPath;
     }
     else {
-    	shortcutViewFrame = CGRectMake(0 - shortcutViewWidth, (bounds.size.height - shortcutViewHeight) / 2, shortcutViewWidth, shortcutViewHeight);
+    	shortcutViewFrame = CGRectMake(0 - shortcutViewWidth, [self shortcutViewCenterYPositionWithHeight:shortcutViewHeight] - shortcutViewHeight / 2, shortcutViewWidth, shortcutViewHeight);
     	shortcutViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, shortcutViewWidth, shortcutViewHeight) byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:(CGSize){10.0, 10.0}].CGPath;
     }
 	self.shortcutView = [[RFView alloc] initWithFrame:shortcutViewFrame];
 	self.shortcutView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.2];
 	self.shortcutView.layer.mask = shortcutViewMaskLayer;
+	self.shortcutView.insetsLayoutMarginsFromSafeArea = NO;
 
+	/*
 	self.shortcutScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.shortcutView.frame.size.width, self.shortcutView.frame.size.height)];
 	self.shortcutScrollView.translatesAutoresizingMaskIntoConstraints = false;
 	self.shortcutScrollView.showsVerticalScrollIndicator = NO;
 	//self.shortcutScrollView.pagingEnabled = YES;
 	self.shortcutScrollView.delegate = self;
+	*/
 
 	self.blurView = [[UIVisualEffectView alloc] initWithEffect:nil];
 	self.blurView.frame = self.view.bounds;
@@ -203,20 +220,24 @@ void openApplication(NSString* bundleID)
 	self.shortcutStackView.alignment = UIStackViewAlignmentLeading;
 	self.shortcutStackView.spacing = shortcutStackViewSpacing;
 	self.shortcutStackView.layoutMarginsRelativeArrangement = YES;
+	self.shortcutStackView.insetsLayoutMarginsFromSafeArea = NO;
 	self.shortcutStackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(shortcutStackViewMarginTop, 0, shortcutStackViewMarginBottom, 0);
 
 	self.shortcutStackView.translatesAutoresizingMaskIntoConstraints = false;
-	[self.shortcutScrollView addSubview:self.shortcutStackView];
-	[self.shortcutView addSubview:self.shortcutScrollView];
+	//[self.shortcutScrollView addSubview:self.shortcutStackView];
+	[self.shortcutView addSubview:self.shortcutStackView];
 
+	/*
 	[self.shortcutScrollView.leadingAnchor constraintEqualToAnchor:self.shortcutView.leadingAnchor].active = true;
     [self.shortcutScrollView.trailingAnchor constraintEqualToAnchor:self.shortcutView.trailingAnchor].active = true;
     [self.shortcutScrollView.topAnchor constraintEqualToAnchor:self.shortcutView.topAnchor].active = true;
     [self.shortcutScrollView.bottomAnchor constraintEqualToAnchor:self.shortcutView.bottomAnchor].active = true;
+	*/
 
-    [self.shortcutStackView.centerXAnchor constraintEqualToAnchor:self.shortcutScrollView.centerXAnchor].active = true;
-    [self.shortcutStackView.topAnchor constraintEqualToAnchor:self.shortcutScrollView.topAnchor].active = true;
-    [self.shortcutStackView.bottomAnchor constraintEqualToAnchor:self.shortcutScrollView.bottomAnchor].active = true;
+    [self.shortcutStackView.centerXAnchor constraintEqualToAnchor:self.shortcutView.centerXAnchor].active = true;
+	[self.shortcutStackView.centerYAnchor constraintEqualToAnchor:self.shortcutView.centerYAnchor].active = true;
+    [self.shortcutStackView.topAnchor constraintEqualToAnchor:self.shortcutView.topAnchor].active = true;
+    [self.shortcutStackView.bottomAnchor constraintEqualToAnchor:self.shortcutView.bottomAnchor].active = true;
 
     for (NSString *app in apps) {
     	[self addIconView:app toStackView:self.shortcutStackView];
@@ -227,6 +248,7 @@ void openApplication(NSString* bundleID)
     self.barView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
     self.barView.backgroundColor = [color colorWithAlphaComponent:barAlpha];
 	self.barView.translatesAutoresizingMaskIntoConstraints = false;
+	self.barView.insetsLayoutMarginsFromSafeArea = NO;
     [self.view addSubview:self.barView];
 
     NSLog(@"[RF] barViewCenterYPosition = %f", barViewCenterYPosition);
@@ -356,6 +378,9 @@ void openApplication(NSString* bundleID)
 			barViewCenterYPosition = self.barView.center.y;
 			[prefs setFloat:self.barView.center.y forKey:@"barViewCenterYPosition"];
 			[prefs setBool:isRightDirection forKey:@"isRightDirection"];
+			CGPoint shortcutViewCenter = self.shortcutView.center;
+			shortcutViewCenter.y = [self shortcutViewCenterYPositionWithHeight:self.shortcutView.frame.size.height];
+			self.shortcutView.center = shortcutViewCenter;
 			break;
 		}
 		default:
@@ -431,7 +456,7 @@ void openApplication(NSString* bundleID)
 	self.isDraggingShortcutView = NO;
 	UIViewPropertyAnimator *animator = [self hidingViewPropertyAnimator];
 	[animator addCompletion:^ (UIViewAnimatingPosition finalPosition) {
-		[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
+		//[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
 		if (self.shortcutView.superview != nil)
 			[self.shortcutView removeFromSuperview];
 		if (self.blurView.superview != nil)
@@ -460,7 +485,7 @@ void openApplication(NSString* bundleID)
 	self.isDraggingShortcutView = NO;
 	animator.reversed = YES;
 	[animator addCompletion:^ (UIViewAnimatingPosition finalPosition) {
-		[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
+		//[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
 		if (self.shortcutView.superview != nil)
 			[self.shortcutView removeFromSuperview];
 		if (self.blurView.superview != nil)
@@ -493,6 +518,7 @@ void openApplication(NSString* bundleID)
 		[timeoutTimer invalidate];
 }
 
+/*
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
 	[self startTimeoutTimer];
 }
@@ -505,6 +531,7 @@ void openApplication(NSString* bundleID)
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
 	[self stopTimeoutTimer];
 }
+*/
 
 - (void)timeoutTimerFired:(NSTimer *)timer {
 	[self hideView];

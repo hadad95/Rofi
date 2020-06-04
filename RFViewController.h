@@ -2,13 +2,13 @@
 #import "SBIconViewDelegate.h"
 #import "Tweak.h"
 
-@interface RFViewController : UIViewController <UIGestureRecognizerDelegate, UIScrollViewDelegate>
+@interface RFViewController : UIViewController <UIGestureRecognizerDelegate>//, UIScrollViewDelegate>
 @property (nonatomic, assign) BOOL isViewVisible;
 @property (nonatomic, assign) BOOL isDraggingShortcutView;
 @property (nonatomic, assign) CGFloat barViewCornerRadius;
 @property (nonatomic, retain) RFView *shortcutView;
 @property (nonatomic, retain) UIStackView *shortcutStackView;
-@property (nonatomic, retain) UIScrollView *shortcutScrollView;
+//@property (nonatomic, retain) UIScrollView *shortcutScrollView;
 @property (nonatomic, retain) UIVisualEffectView *blurView;
 @property (nonatomic, retain) UIView *barView;
 @property (nonatomic, retain) UIPanGestureRecognizer *edgePan;

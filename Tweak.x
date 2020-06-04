@@ -78,13 +78,55 @@ static BOOL hideWhenTakingScreenshots;
 }
 
 - (void)screenCapturer:(id)arg1 didCaptureScreenshotsOfScreens:(id)arg2 {
-	NSLog(@"[RF] takeScreenshot called!");
+	NSLog(@"[RF] screenCapturer:didCaptureScreenshotsOfScreens: called!");
 	if (hideWhenTakingScreenshots)
 		viewController.barView.alpha = 1;
 	
 	%orig;
 }
 
+%end
+
+%hook SBIconView
+- (void)_updateAccessoryViewWithAnimation:(BOOL)arg1 {
+	%orig;
+	UIView *badge = [self valueForKey:@"_accessoryView"];
+	//UIView *badge = MSHookIvar<UIView *>(self, "_accessoryView");
+	if (!viewController || !viewController.shortcutStackView)
+		return;
+	
+	for (SBIconImageView *subview in viewController.shortcutStackView.arrangedSubviews) {
+		if ([[subview.icon applicationBundleID] isEqualToString:[self.icon applicationBundleID]]) {
+			for (UIView *accessory in subview.subviews) {
+				[accessory removeFromSuperview];
+			}
+			if (!badge)
+				return;
+			
+			SBIconBadgeView *temp = [[%c(SBIconBadgeView) alloc] init];
+			/*
+			[temp setValue:[badge valueForKey:@"_text"] forKey:@"_text"];
+			[temp setValue:[badge valueForKey:@"_incomingTextView"] forKey:@"_incomingTextView"];
+			[temp setValue:[badge valueForKey:@"_displayingAccessory"] forKey:@"_displayingAccessory"];
+			[temp setValue:[badge valueForKey:@"_backgroundImage"] forKey:@"_backgroundImage"];
+			[temp setValue:[badge valueForKey:@"_backgroundView"] forKey:@"_backgroundView"];
+			[temp setValue:[badge valueForKey:@"_textImage"] forKey:@"_textImage"];
+			[temp setValue:[badge valueForKey:@"_textView"] forKey:@"_textView"];
+			*/
+			[temp configureForIcon:self.icon infoProvider:self];
+			temp.center = [self _centerForAccessoryView];
+			[subview addSubview:temp];
+			return;
+		}
+	}
+}
+%end
+
+%hook SBIconBadgeView
+- (void)configureForIcon:(id)arg1 infoProvider:(id)arg2 {
+	NSLog(@"[RF] configureForIcon: arg1 = %@, arg2 = %@", [arg1 class], [arg2 class]);
+	%orig;
+}
 %end
 
 %ctor {
