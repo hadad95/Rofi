@@ -1,5 +1,3 @@
-@import UIKit;
-
 #import "SBIconViewDelegate.h"
 
 @interface SpringBoard

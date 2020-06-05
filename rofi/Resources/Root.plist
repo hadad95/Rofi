@@ -65,7 +65,7 @@
 		    <key>label</key>
 		    <string>Apps per page: %i</string>
 		    <key>max</key>
-		    <real>6</real>
+		    <real>99</real>
 		    <key>min</key>
 		    <real>1</real>
 		    <key>singularLabel</key>

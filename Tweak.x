@@ -122,13 +122,6 @@ static BOOL hideWhenTakingScreenshots;
 }
 %end
 
-%hook SBIconBadgeView
-- (void)configureForIcon:(id)arg1 infoProvider:(id)arg2 {
-	NSLog(@"[RF] configureForIcon: arg1 = %@, arg2 = %@", [arg1 class], [arg2 class]);
-	%orig;
-}
-%end
-
 %ctor {
 	HBPreferences *prefs = [HBPreferences preferencesForIdentifier:@"com.kef.rofi"];
 	isEnabled = [prefs boolForKey:@"isEnabled" default:YES];

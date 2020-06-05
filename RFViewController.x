@@ -52,11 +52,11 @@ void openApplication(NSString* bundleID)
 		self.barViewCornerRadius = 10;
 
 		prefs = [HBPreferences preferencesForIdentifier:@"com.kef.rofi"];
-		//numberOfIcons = [prefs integerForKey:@"numberOfIcons" default:4];
+		numberOfIcons = [prefs integerForKey:@"numberOfIcons" default:4];
 		isRightDirection = [prefs boolForKey:@"isRightDirection" default:NO];
 		barViewCenterYPosition = [prefs floatForKey:@"barViewCenterYPosition" default:UIScreen.mainScreen.bounds.size.height/2];
 		apps = (NSArray *)[prefs objectForKey:@"selectedApps" default:[[NSArray alloc] init]];
-		numberOfIcons = apps.count;
+		//numberOfIcons = apps.count;
 
 		[prefs registerBool:&isBarMovable default:YES forKey:@"isBarMovable"];
 		[prefs registerFloat:&barWidth default:10.0 forKey:@"barWidth"];
@@ -201,13 +201,12 @@ void openApplication(NSString* bundleID)
 	self.shortcutView.layer.mask = shortcutViewMaskLayer;
 	self.shortcutView.insetsLayoutMarginsFromSafeArea = NO;
 
-	/*
 	self.shortcutScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.shortcutView.frame.size.width, self.shortcutView.frame.size.height)];
 	self.shortcutScrollView.translatesAutoresizingMaskIntoConstraints = false;
 	self.shortcutScrollView.showsVerticalScrollIndicator = NO;
-	//self.shortcutScrollView.pagingEnabled = YES;
+	self.shortcutScrollView.pagingEnabled = YES;
 	self.shortcutScrollView.delegate = self;
-	*/
+	//self.shortcutScrollView.insetsLayoutMarginsFromSafeArea = NO;
 
 	self.blurView = [[UIVisualEffectView alloc] initWithEffect:nil];
 	self.blurView.frame = self.view.bounds;
@@ -224,20 +223,18 @@ void openApplication(NSString* bundleID)
 	self.shortcutStackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(shortcutStackViewMarginTop, 0, shortcutStackViewMarginBottom, 0);
 
 	self.shortcutStackView.translatesAutoresizingMaskIntoConstraints = false;
-	//[self.shortcutScrollView addSubview:self.shortcutStackView];
-	[self.shortcutView addSubview:self.shortcutStackView];
+	[self.shortcutScrollView addSubview:self.shortcutStackView];
+	[self.shortcutView addSubview:self.shortcutScrollView];
 
-	/*
 	[self.shortcutScrollView.leadingAnchor constraintEqualToAnchor:self.shortcutView.leadingAnchor].active = true;
     [self.shortcutScrollView.trailingAnchor constraintEqualToAnchor:self.shortcutView.trailingAnchor].active = true;
     [self.shortcutScrollView.topAnchor constraintEqualToAnchor:self.shortcutView.topAnchor].active = true;
     [self.shortcutScrollView.bottomAnchor constraintEqualToAnchor:self.shortcutView.bottomAnchor].active = true;
-	*/
 
-    [self.shortcutStackView.centerXAnchor constraintEqualToAnchor:self.shortcutView.centerXAnchor].active = true;
-	[self.shortcutStackView.centerYAnchor constraintEqualToAnchor:self.shortcutView.centerYAnchor].active = true;
-    [self.shortcutStackView.topAnchor constraintEqualToAnchor:self.shortcutView.topAnchor].active = true;
-    [self.shortcutStackView.bottomAnchor constraintEqualToAnchor:self.shortcutView.bottomAnchor].active = true;
+    [self.shortcutStackView.centerXAnchor constraintEqualToAnchor:self.shortcutScrollView.centerXAnchor].active = true;
+	//[self.shortcutStackView.centerYAnchor constraintEqualToAnchor:self.shortcutScrollView.centerYAnchor].active = true;
+    [self.shortcutStackView.topAnchor constraintEqualToAnchor:self.shortcutScrollView.topAnchor].active = true;
+    [self.shortcutStackView.bottomAnchor constraintEqualToAnchor:self.shortcutScrollView.bottomAnchor].active = true;
 
     for (NSString *app in apps) {
     	[self addIconView:app toStackView:self.shortcutStackView];
@@ -456,7 +453,7 @@ void openApplication(NSString* bundleID)
 	self.isDraggingShortcutView = NO;
 	UIViewPropertyAnimator *animator = [self hidingViewPropertyAnimator];
 	[animator addCompletion:^ (UIViewAnimatingPosition finalPosition) {
-		//[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
+		[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
 		if (self.shortcutView.superview != nil)
 			[self.shortcutView removeFromSuperview];
 		if (self.blurView.superview != nil)
@@ -485,7 +482,7 @@ void openApplication(NSString* bundleID)
 	self.isDraggingShortcutView = NO;
 	animator.reversed = YES;
 	[animator addCompletion:^ (UIViewAnimatingPosition finalPosition) {
-		//[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
+		[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
 		if (self.shortcutView.superview != nil)
 			[self.shortcutView removeFromSuperview];
 		if (self.blurView.superview != nil)
@@ -518,7 +515,6 @@ void openApplication(NSString* bundleID)
 		[timeoutTimer invalidate];
 }
 
-/*
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
 	[self startTimeoutTimer];
 }
@@ -531,7 +527,6 @@ void openApplication(NSString* bundleID)
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
 	[self stopTimeoutTimer];
 }
-*/
 
 - (void)timeoutTimerFired:(NSTimer *)timer {
 	[self hideView];
