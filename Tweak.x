@@ -100,23 +100,30 @@ static BOOL hideWhenTakingScreenshots;
 			for (UIView *accessory in subview.subviews) {
 				[accessory removeFromSuperview];
 			}
-			if (!badge)
+			if (!badge || ![badge valueForKey:@"_text"])
 				return;
 			
+			NSLog(@"[RF] badge _text = %@", [badge valueForKey:@"_text"]);
 			SBIconBadgeView *temp = [[%c(SBIconBadgeView) alloc] init];
-			/*
-			[temp setValue:[badge valueForKey:@"_text"] forKey:@"_text"];
-			[temp setValue:[badge valueForKey:@"_incomingTextView"] forKey:@"_incomingTextView"];
-			[temp setValue:[badge valueForKey:@"_displayingAccessory"] forKey:@"_displayingAccessory"];
-			[temp setValue:[badge valueForKey:@"_backgroundImage"] forKey:@"_backgroundImage"];
-			[temp setValue:[badge valueForKey:@"_backgroundView"] forKey:@"_backgroundView"];
-			[temp setValue:[badge valueForKey:@"_textImage"] forKey:@"_textImage"];
-			[temp setValue:[badge valueForKey:@"_textView"] forKey:@"_textView"];
-			*/
 			[temp configureForIcon:self.icon infoProvider:self];
 			temp.center = [self _centerForAccessoryView];
 			[subview addSubview:temp];
 			return;
+		}
+	}
+}
+
+- (void)_destroyAccessoryView:(id)arg1 {
+	NSLog(@"[RF] _destroyAccessoryView called");
+	%orig;
+	if (!viewController || !viewController.shortcutStackView || ![arg1 isKindOfClass:%c(SBIconBadgeView)])
+		return;
+	
+	for (SBIconImageView *subview in viewController.shortcutStackView.arrangedSubviews) {
+		if ([[subview.icon applicationBundleID] isEqualToString:[self.icon applicationBundleID]]) {
+			for (UIView *accessory in subview.subviews) {
+				[accessory removeFromSuperview];
+			}
 		}
 	}
 }
@@ -127,11 +134,11 @@ static BOOL hideWhenTakingScreenshots;
 	isEnabled = [prefs boolForKey:@"isEnabled" default:YES];
 	[prefs registerBool:&hideWhenTakingScreenshots default:NO forKey:@"hideWhenTakingScreenshots"];
 	NSLog(@"[RF] isEnabled = %@", isEnabled ? @"YES" : @"NO");
-	int notify_token;
-	// com.apple.iokit.hid.displayStatus state 0 = off, 1 = on
-	// com.apple.springboard.hasBlankedScreen state 0 = on, 1 = off
+	// com.apple.iokit.hid.displayStatus state: 0 = off, 1 = on
+	// com.apple.springboard.hasBlankedScreen state: 0 = on, 1 = off
+	int notify_token_1;
 	notify_register_dispatch("com.apple.springboard.hasBlankedScreen",
-		&notify_token,
+		&notify_token_1,
 		dispatch_get_main_queue(),
 		^(int token) {
 			uint64_t state = UINT64_MAX;
@@ -139,5 +146,29 @@ static BOOL hideWhenTakingScreenshots;
             if (state == 1) {
             	[viewController hideView];
             }
+        });
+	
+	int notify_token_2;
+	notify_register_dispatch("com.spark.snowboard.refreshComplete",
+		&notify_token_2,
+		dispatch_get_main_queue(),
+		^(int token) {
+			NSLog(@"[RF] Snowboard refresh completed!");
+			if (!viewController || !viewController.shortcutStackView)
+				return;
+			
+			[viewController reloadIcons];
+        });
+	
+	int notify_token_3;
+	notify_register_dispatch("com.kef.rofi/ReloadApps",
+		&notify_token_3,
+		dispatch_get_main_queue(),
+		^(int token) {
+			NSLog(@"[RF] Reloading apps...");
+			if (!viewController || !viewController.shortcutStackView)
+				return;
+			
+			[viewController reloadIcons];
         });
 }

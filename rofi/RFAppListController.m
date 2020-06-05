@@ -9,7 +9,7 @@ HBPreferences *prefs;
 
 @implementation RFAppListController
 
-- (RFAppListController *)initWithStyle:(UITableViewStyle)style {
+- (instancetype)initWithStyle:(UITableViewStyle)style {
 	self = [super initWithStyle:style];
 	if (self) {
 		selectedApps = [[NSMutableArray alloc] init];
@@ -109,7 +109,7 @@ HBPreferences *prefs;
 		[selectedApps removeObjectAtIndex:sourceIndexPath.row];
 		[selectedApps insertObject:app atIndex:destinationIndexPath.row];
 		//[SparkAppList setAppList:[selectedApps copy] forIdentifier:@"com.kef.rofi" andKey:@"selectedApps"];
-		[prefs setObject:[selectedApps copy] forKey:@"selectedApps"];
+		//[prefs setObject:[selectedApps copy] forKey:@"selectedApps"];
 	}
 }
 
@@ -155,6 +155,12 @@ HBPreferences *prefs;
 		[tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:1]] withRowAnimation:UITableViewRowAnimationTop];
 		[tableView endUpdates];
 	}
+	//[prefs setObject:[selectedApps copy] forKey:@"selectedApps"];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+	NSLog(@"[RF] viewDidDisappear called. animated = %@", animated ? @"YES" : @"NO");
 	[prefs setObject:[selectedApps copy] forKey:@"selectedApps"];
+	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.kef.rofi/ReloadApps"), NULL, NULL, true);
 }
 @end

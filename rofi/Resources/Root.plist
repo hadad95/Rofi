@@ -70,6 +70,8 @@
 		    <real>1</real>
 		    <key>singularLabel</key>
 		    <string>Apps per page: 1</string>
+			<key>PostNotification</key>
+			<string>com.kef.rofi/ReloadNumberOfIcons</string>
 		</dict>
 		<dict>
 			<key>cell</key>

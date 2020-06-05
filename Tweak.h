@@ -80,6 +80,7 @@
 - (SBIconImageView *)_iconImageView;
 - (void)_updateAccessoryViewWithAnimation:(BOOL)arg1;
 - (CGPoint)_centerForAccessoryView;
+- (void)_destroyAccessoryView:(id)arg1;
 @end
 
 @interface UIApplication (Private)

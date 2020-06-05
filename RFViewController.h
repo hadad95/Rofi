@@ -6,14 +6,18 @@
 @property (nonatomic, assign) BOOL isViewVisible;
 @property (nonatomic, assign) BOOL isDraggingShortcutView;
 @property (nonatomic, assign) CGFloat barViewCornerRadius;
+@property (nonatomic, assign) CGFloat shortcutStackViewSpacing;
+@property (nonatomic, assign) CGFloat shortcutViewWidth;
 @property (nonatomic, retain) RFView *shortcutView;
 @property (nonatomic, retain) UIStackView *shortcutStackView;
 @property (nonatomic, retain) UIScrollView *shortcutScrollView;
 @property (nonatomic, retain) UIVisualEffectView *blurView;
 @property (nonatomic, retain) UIView *barView;
 @property (nonatomic, retain) UIPanGestureRecognizer *edgePan;
+@property (nonatomic, retain) NSArray *apps;
 - (SBIconView *)getIconView:(NSString *)identifier;
 - (void)addIconView:(NSString *)identifier toStackView:(UIStackView *)stackView;
+- (void)reloadIcons;
 - (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture;
 - (UIViewPropertyAnimator *)showingViewPropertyAnimator;
 - (UIViewPropertyAnimator *)hidingViewPropertyAnimator;

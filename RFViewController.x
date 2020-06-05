@@ -1,6 +1,7 @@
 #import "RFViewController.h"
 #import <Cephei/HBPreferences.h>
 #import "SparkColourPickerUtils.h"
+#import <notify.h>
 
 #define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 
@@ -15,7 +16,7 @@ HBPreferences *prefs;
 NSInteger numberOfIcons;
 BOOL isRightDirection;
 CGFloat barViewCenterYPosition;
-NSArray *apps;
+//NSArray *apps;
 BOOL isBarMovable;
 BOOL isBarMoving;
 CGFloat barWidth;
@@ -55,9 +56,9 @@ void openApplication(NSString* bundleID)
 		numberOfIcons = [prefs integerForKey:@"numberOfIcons" default:4];
 		isRightDirection = [prefs boolForKey:@"isRightDirection" default:NO];
 		barViewCenterYPosition = [prefs floatForKey:@"barViewCenterYPosition" default:UIScreen.mainScreen.bounds.size.height/2];
-		apps = (NSArray *)[prefs objectForKey:@"selectedApps" default:[[NSArray alloc] init]];
 		//numberOfIcons = apps.count;
 
+		//[prefs registerInteger:&numberOfIcons default:4 forKey:@"numberOfIcons"];
 		[prefs registerBool:&isBarMovable default:YES forKey:@"isBarMovable"];
 		[prefs registerFloat:&barWidth default:10.0 forKey:@"barWidth"];
 		[prefs registerFloat:&barHeight default:100.0 forKey:@"barHeight"];
@@ -81,40 +82,58 @@ void openApplication(NSString* bundleID)
 			[self.view layoutIfNeeded];
 			[UIView animateWithDuration:0.25
 				animations:^ {
-					//self.barView.center = center;
-					//barViewCenterXConstraint.constant = center.x;
-					//barViewCenterYConstraint.constant = center.y;
 					barViewHeightConstraint.constant = barHeight;
 					barViewWidthConstraint.constant = 2*barWidth;
 					[self.view layoutIfNeeded];
-					//self.barView.transform = CGAffineTransformScale(self.barView.transform, barWidth / self.barView.frame.size.width, barHeight / self.barView.frame.size.height);
-					//self.barView.frame = CGRectInset(self.barView.frame, self.barView.frame.size.width - barWidth, self.barView.frame.size.height - barHeight);
 					self.barView.backgroundColor = [color colorWithAlphaComponent:barAlpha];
-					//self.barView.bounds = CGRectMake(0, 0, barWidth, barHeight);
 				}
-				completion:^ (BOOL finished) {
-					NSLog(@"[RF] completion called. finished = %@", finished ? @"YES" : @"NO");
-					NSLog(@"[RF] barView bounds = %@", NSStringFromCGRect(self.barView.bounds));
-					/*
-					if (isRightDirection) {
-						CAShapeLayer * maskLayer = [CAShapeLayer layer];
-						maskLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.barView.bounds byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:self.barViewCornerRadiusSize].CGPath;
-						self.barView.layer.mask = maskLayer;
-					}
-					else {
-						CAShapeLayer * maskLayer = [CAShapeLayer layer];
-						maskLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.barView.bounds byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:self.barViewCornerRadiusSize].CGPath;
-						self.barView.layer.mask = maskLayer;	
-					}
-					*/
-				}];
+				completion:nil];
 		}];
+
+		int notify_token;
+		notify_register_dispatch("com.kef.rofi/ReloadNumberOfIcons",
+			&notify_token,
+			dispatch_get_main_queue(),
+			^(int token) {
+				numberOfIcons = [prefs integerForKey:@"numberOfIcons" default:4];
+				if (!self.shortcutView)
+					return;
+				
+				NSLog(@"[RF] changing prefs/shortcutView frame. numberOfIcons = %ld", numberOfIcons);
+				CGRect bounds = UIScreen.mainScreen.bounds;
+				CGSize iconSize = [[self getIconView:@"com.apple.Preferences"] _iconImageView].frame.size;
+				CGFloat shortcutViewHeight = iconSize.height * numberOfIcons + numberOfIcons * self.shortcutStackViewSpacing;
+				CGRect shortcutViewFrame;
+				CAShapeLayer *shortcutViewMaskLayer = [CAShapeLayer layer];
+				if (isRightDirection) {
+					shortcutViewFrame = CGRectMake(bounds.size.width, [self shortcutViewCenterYPositionWithHeight:shortcutViewHeight] - shortcutViewHeight / 2, self.shortcutViewWidth, shortcutViewHeight);
+					shortcutViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, self.shortcutViewWidth, shortcutViewHeight) byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:(CGSize){10.0, 10.0}].CGPath;
+				}
+				else {
+					shortcutViewFrame = CGRectMake(0 - self.shortcutViewWidth, [self shortcutViewCenterYPositionWithHeight:shortcutViewHeight] - shortcutViewHeight / 2, self.shortcutViewWidth, shortcutViewHeight);
+					shortcutViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, self.shortcutViewWidth, shortcutViewHeight) byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:(CGSize){10.0, 10.0}].CGPath;
+				}
+				self.shortcutView.frame = shortcutViewFrame;
+				self.shortcutView.layer.mask = shortcutViewMaskLayer;
+			});
 	}
 	return self;
 }
 
 - (BOOL)shouldAutorotate {
 	return NO;
+}
+
+- (void)reloadIcons {
+	self.apps = (NSArray *)[prefs objectForKey:@"selectedApps" default:[[NSArray alloc] init]];
+	if (self.shortcutStackView.arrangedSubviews.count) {
+		for (UIView *subview in self.shortcutStackView.arrangedSubviews)
+			[subview removeFromSuperview];
+	}
+	for (NSString *app in self.apps) {
+    	[self addIconView:app toStackView:self.shortcutStackView];
+    	NSLog(@"[RF] icon frame = %@", NSStringFromCGRect(self.shortcutStackView.arrangedSubviews[0].frame));
+    }
 }
 
 - (SBIconView*)getIconView:(NSString *)identifier {
@@ -145,9 +164,10 @@ void openApplication(NSString* bundleID)
 
 - (void)addIconView:(NSString *)identifier toStackView:(UIStackView *)stackView {
 	SBIconView *iconView = [self getIconView:identifier];
-	if (iconView == nil)
+	if (!iconView)
 		return;
 
+	CGPoint badgeCenter = [iconView _centerForAccessoryView]; // get center before adding to stack view, to avoid weird badge placement
 	UIView *imageView = [iconView _iconImageView];
 	for (UIView *subview in imageView.subviews) { // removing notification badges (iOS 13)
 		[subview removeFromSuperview];
@@ -158,6 +178,17 @@ void openApplication(NSString* bundleID)
 	[stackView addArrangedSubview:imageView];
     [imageView.widthAnchor constraintEqualToConstant:iconWidth].active = true;
     [imageView.heightAnchor constraintEqualToConstant:iconHeight].active = true;
+	// adding notification badge
+	SBIconBadgeView *badge = [[%c(SBIconBadgeView) alloc] init];
+	if (badge) {
+		[badge configureForIcon:iconView.icon infoProvider:iconView];
+		if ([badge valueForKey:@"_text"]) {
+			NSLog(@"[RF] addIconView: center = %@", NSStringFromCGPoint([iconView _centerForAccessoryView]));
+			badge.center = badgeCenter;
+			[imageView addSubview:badge];
+		}
+	}
+
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(iconTapped:)];
 	[imageView addGestureRecognizer:tapRecognizer];
 	imageView.userInteractionEnabled = YES;
@@ -178,23 +209,23 @@ void openApplication(NSString* bundleID)
 
 	CGSize iconSize = [[self getIconView:@"com.apple.Preferences"] _iconImageView].frame.size;
 
-	CGFloat shortcutViewWidth = iconSize.width + 20;
-	CGFloat shortcutStackViewSpacing = 20;
-	CGFloat shortcutStackViewMarginTop = shortcutStackViewSpacing / 2;
+	self.shortcutViewWidth = iconSize.width + 20;
+	self.shortcutStackViewSpacing = 20;
+	CGFloat shortcutStackViewMarginTop = self.shortcutStackViewSpacing / 2;
 	CGFloat shortcutStackViewMarginBottom = shortcutStackViewMarginTop;
-	CGFloat shortcutViewHeight = iconSize.height * numberOfIcons + numberOfIcons * shortcutStackViewSpacing;
+	CGFloat shortcutViewHeight = iconSize.height * numberOfIcons + numberOfIcons * self.shortcutStackViewSpacing;
 
 	CGRect bounds = [[UIScreen mainScreen] bounds];
 
 	CGRect shortcutViewFrame;
 	CAShapeLayer *shortcutViewMaskLayer = [CAShapeLayer layer];
     if (isRightDirection) {
-    	shortcutViewFrame = CGRectMake(bounds.size.width, [self shortcutViewCenterYPositionWithHeight:shortcutViewHeight] - shortcutViewHeight / 2, shortcutViewWidth, shortcutViewHeight);
-    	shortcutViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, shortcutViewWidth, shortcutViewHeight) byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:(CGSize){10.0, 10.0}].CGPath;
+    	shortcutViewFrame = CGRectMake(bounds.size.width, [self shortcutViewCenterYPositionWithHeight:shortcutViewHeight] - shortcutViewHeight / 2, self.shortcutViewWidth, shortcutViewHeight);
+    	shortcutViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, self.shortcutViewWidth, shortcutViewHeight) byRoundingCorners:UIRectCornerTopLeft | UIRectCornerBottomLeft cornerRadii:(CGSize){10.0, 10.0}].CGPath;
     }
     else {
-    	shortcutViewFrame = CGRectMake(0 - shortcutViewWidth, [self shortcutViewCenterYPositionWithHeight:shortcutViewHeight] - shortcutViewHeight / 2, shortcutViewWidth, shortcutViewHeight);
-    	shortcutViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, shortcutViewWidth, shortcutViewHeight) byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:(CGSize){10.0, 10.0}].CGPath;
+    	shortcutViewFrame = CGRectMake(0 - self.shortcutViewWidth, [self shortcutViewCenterYPositionWithHeight:shortcutViewHeight] - shortcutViewHeight / 2, self.shortcutViewWidth, shortcutViewHeight);
+    	shortcutViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, self.shortcutViewWidth, shortcutViewHeight) byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:(CGSize){10.0, 10.0}].CGPath;
     }
 	self.shortcutView = [[RFView alloc] initWithFrame:shortcutViewFrame];
 	self.shortcutView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.2];
@@ -217,7 +248,7 @@ void openApplication(NSString* bundleID)
 	self.shortcutStackView.axis = UILayoutConstraintAxisVertical;
 	self.shortcutStackView.distribution = UIStackViewDistributionEqualSpacing;
 	self.shortcutStackView.alignment = UIStackViewAlignmentLeading;
-	self.shortcutStackView.spacing = shortcutStackViewSpacing;
+	self.shortcutStackView.spacing = self.shortcutStackViewSpacing;
 	self.shortcutStackView.layoutMarginsRelativeArrangement = YES;
 	self.shortcutStackView.insetsLayoutMarginsFromSafeArea = NO;
 	self.shortcutStackView.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(shortcutStackViewMarginTop, 0, shortcutStackViewMarginBottom, 0);
@@ -236,10 +267,7 @@ void openApplication(NSString* bundleID)
     [self.shortcutStackView.topAnchor constraintEqualToAnchor:self.shortcutScrollView.topAnchor].active = true;
     [self.shortcutStackView.bottomAnchor constraintEqualToAnchor:self.shortcutScrollView.bottomAnchor].active = true;
 
-    for (NSString *app in apps) {
-    	[self addIconView:app toStackView:self.shortcutStackView];
-    	NSLog(@"[RF] icon frame = %@", NSStringFromCGRect(self.shortcutStackView.arrangedSubviews[0].frame));
-    }
+    [self reloadIcons];
 
     UIColor *color = [SparkColourPickerUtils colourWithString:barColor withFallback:@"#99AAB5"];
     self.barView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
