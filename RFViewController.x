@@ -25,6 +25,7 @@ CGFloat barAlpha;
 NSString *barColor;
 BOOL isTimeoutEnabled;
 NSInteger timeoutDelay;
+BOOL isBlurEnabled;
 
 void openApplication(NSString* bundleID)
 {
@@ -59,6 +60,7 @@ void openApplication(NSString* bundleID)
 		//numberOfIcons = apps.count;
 
 		//[prefs registerInteger:&numberOfIcons default:4 forKey:@"numberOfIcons"];
+		[prefs registerBool:&isBlurEnabled default:YES forKey:@"isBlurEnabled"];
 		[prefs registerBool:&isBarMovable default:YES forKey:@"isBarMovable"];
 		[prefs registerFloat:&barWidth default:10.0 forKey:@"barWidth"];
 		[prefs registerFloat:&barHeight default:100.0 forKey:@"barHeight"];
@@ -209,8 +211,8 @@ void openApplication(NSString* bundleID)
 
 	CGSize iconSize = [[self getIconView:@"com.apple.Preferences"] _iconImageView].frame.size;
 
-	self.shortcutViewWidth = iconSize.width + 20;
-	self.shortcutStackViewSpacing = 20;
+	self.shortcutViewWidth = iconSize.width + 25;
+	self.shortcutStackViewSpacing = 24;
 	CGFloat shortcutStackViewMarginTop = self.shortcutStackViewSpacing / 2;
 	CGFloat shortcutStackViewMarginBottom = shortcutStackViewMarginTop;
 	CGFloat shortcutViewHeight = iconSize.height * numberOfIcons + numberOfIcons * self.shortcutStackViewSpacing;
@@ -228,9 +230,12 @@ void openApplication(NSString* bundleID)
     	shortcutViewMaskLayer.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, self.shortcutViewWidth, shortcutViewHeight) byRoundingCorners:UIRectCornerTopRight | UIRectCornerBottomRight cornerRadii:(CGSize){10.0, 10.0}].CGPath;
     }
 	self.shortcutView = [[RFView alloc] initWithFrame:shortcutViewFrame];
-	self.shortcutView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.2];
+	self.shortcutView.backgroundColor = [UIColor colorWithWhite:0.15 alpha:0.8];
 	self.shortcutView.layer.mask = shortcutViewMaskLayer;
 	self.shortcutView.insetsLayoutMarginsFromSafeArea = NO;
+	self.shortcutPan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleShortcutPan:)];
+	self.shortcutPan.delegate = self;
+	[self.shortcutView addGestureRecognizer:self.shortcutPan];
 
 	self.shortcutScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.shortcutView.frame.size.width, self.shortcutView.frame.size.height)];
 	self.shortcutScrollView.translatesAutoresizingMaskIntoConstraints = false;
@@ -241,6 +246,7 @@ void openApplication(NSString* bundleID)
 
 	self.blurView = [[UIVisualEffectView alloc] initWithEffect:nil];
 	self.blurView.frame = self.view.bounds;
+	self.blurView.backgroundColor = UIColor.clearColor;
 	UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(blurViewTapped:)];
 	[self.blurView addGestureRecognizer:tapRecognizer];
 
@@ -295,16 +301,50 @@ void openApplication(NSString* bundleID)
     barViewWidthConstraint.active = true;
     barViewHeightConstraint.active = true;
 
-    self.edgePan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
-	self.edgePan.delegate = self;
-	[self.barView addGestureRecognizer:self.edgePan];
+    self.barEdgePan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleBarEdgePan:)];
+	self.barEdgePan.delegate = self;
+	[self.barView addGestureRecognizer:self.barEdgePan];
 
 	UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(barViewLongPress:)];
 	longPress.minimumPressDuration = 0.5;
 	[self.barView addGestureRecognizer:longPress];
 }
 
-- (void)handlePan:(UIScreenEdgePanGestureRecognizer *)gesture {
+- (void)handleShortcutPan:(UIPanGestureRecognizer *)gesture {
+	CGFloat width = self.shortcutView.frame.size.width;
+	CGFloat percent = MAX(pow(-1, (int)!isRightDirection) * [gesture translationInView:gesture.view].x, 0)/width;
+	//percent = 1 - percent;
+	NSLog(@"[RF] handleShortcutPan called. percent = %f", percent);
+	if (gesture.state == UIGestureRecognizerStateBegan){
+    	self.isDraggingShortcutView = YES;
+    	panAnimator = [self hidingViewPropertyAnimator];
+    	//[self.view addSubview:self.blurView];
+    	//[self.view addSubview:self.shortcutView];
+    }
+    else if (gesture.state == UIGestureRecognizerStateChanged) {
+    	if (percent < 0.0)
+    		percent = 0.0;
+
+    	panAnimator.fractionComplete = percent;
+    }
+    else if (gesture.state == UIGestureRecognizerStateEnded) {
+    	if (percent >= 0.3)
+    		[self hideViewWithPropertyAnimator:panAnimator isHiding:YES];
+    	else {
+			/*
+    		if (percent == 1) {
+    			self.blurView.effect = nil;
+				self.blurView.backgroundColor = UIColor.clearColor;
+			}
+			*/
+
+    		[self showViewWithPropertyAnimator:panAnimator isHiding:YES];
+    	}
+		//panAnimator = nil; // prevent a possible retain cycle
+    }
+}
+
+- (void)handleBarEdgePan:(UIPanGestureRecognizer *)gesture {
     CGFloat width = self.shortcutView.frame.size.width;
     // TODO: change the shit out of this
     CGFloat percent = MAX(pow(-1, (int)isRightDirection) * [gesture translationInView:gesture.view ].x, 0)/width;
@@ -322,13 +362,16 @@ void openApplication(NSString* bundleID)
     }
     else if (gesture.state == UIGestureRecognizerStateEnded) {
     	if (percent >= 0.3)
-    		[self showViewWithPropertyAnimator:panAnimator];
+    		[self showViewWithPropertyAnimator:panAnimator isHiding:NO];
     	else {
-    		if (percent == 0)
+    		if (percent == 0) {
     			self.blurView.effect = nil;
+				self.blurView.backgroundColor = UIColor.clearColor;
+			}
 
-    		[self hideViewWithPropertyAnimator:panAnimator];
+    		[self hideViewWithPropertyAnimator:panAnimator isHiding:NO];
     	}
+		panAnimator = nil; // prevent a possible retain cycle
     }
 }
 
@@ -427,7 +470,11 @@ void openApplication(NSString* bundleID)
 			else {
 				center.x = self.shortcutView.frame.size.width / 2;
 			}
-			self.blurView.effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+			if (isBlurEnabled)
+				self.blurView.effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+			else
+				self.blurView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.6];
+			
 			self.shortcutView.center = center;
 		}];
 
@@ -447,6 +494,7 @@ void openApplication(NSString* bundleID)
 				center.x = -1 * self.shortcutView.frame.size.width / 2;
 			}
 			self.blurView.effect = nil;
+			self.blurView.backgroundColor = UIColor.clearColor;
 			self.shortcutView.center = center;
 		}];
 
@@ -490,25 +538,26 @@ void openApplication(NSString* bundleID)
 	[animator startAnimation];
 }
 
-- (void)showViewWithPropertyAnimator:(UIViewPropertyAnimator *)animator {
+- (void)showViewWithPropertyAnimator:(UIViewPropertyAnimator *)animator isHiding:(BOOL)isHiding {
 	if (self.isViewVisible && !self.isDraggingShortcutView)
 		return;
 
 	self.isViewVisible = YES;
 	self.isDraggingShortcutView = NO;
+	animator.reversed = isHiding;
 	[animator addCompletion:^ (UIViewAnimatingPosition finalPosition) {
 		[self startTimeoutTimer];
 	}];
 	[animator startAnimation];
 }
 
-- (void)hideViewWithPropertyAnimator:(UIViewPropertyAnimator *)animator {
+- (void)hideViewWithPropertyAnimator:(UIViewPropertyAnimator *)animator isHiding:(BOOL)isHiding {
 	if (!self.isViewVisible && !self.isDraggingShortcutView)
 		return;
 
 	self.isViewVisible = NO;
 	self.isDraggingShortcutView = NO;
-	animator.reversed = YES;
+	animator.reversed = !isHiding;
 	[animator addCompletion:^ (UIViewAnimatingPosition finalPosition) {
 		[self.shortcutScrollView setContentOffset:CGPointMake(0, 0) animated:NO];
 		if (self.shortcutView.superview != nil)

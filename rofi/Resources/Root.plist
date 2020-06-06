@@ -81,6 +81,20 @@
 		</dict>
 		<dict>
 			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.kef.rofi</string>
+			<key>key</key>
+			<string>isBlurEnabled</string>
+			<key>label</key>
+			<string>Enable background blur</string>
+			<key>PostNotification</key>
+			<string>com.kef.rofi/ReloadPrefs</string>
+		</dict>
+		<dict>
+			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Slider settings</string>
