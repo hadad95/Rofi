@@ -16,10 +16,8 @@ static BOOL hideWhenTakingScreenshots;
 %subclass RFWindow : SBSecureWindow
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
 	UIView *viewAtPoint = [self.rootViewController.view hitTest:point withEvent:event];
-	BOOL ret;
-	if (!viewAtPoint || (viewAtPoint == self.rootViewController.view)) ret = NO;
-	else ret = YES;
-	return ret;
+	if (!viewAtPoint || (viewAtPoint == self.rootViewController.view)) return NO;
+	else return YES;
 }
 %end
 

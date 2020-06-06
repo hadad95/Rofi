@@ -5,11 +5,11 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        UIBarButtonItem *respringButton = [[UIBarButtonItem alloc] initWithTitle:@"Respring" style:UIBarButtonItemStylePlain target:self action:@selector(respring)];
+        UIBarButtonItem *respringButton = [[UIBarButtonItem alloc] initWithTitle:@"Apply" style:UIBarButtonItemStylePlain target:self action:@selector(respring)];
         self.navigationItem.rightBarButtonItem = respringButton;
 
         RFAppearanceSettings *appearanceSettings = [[RFAppearanceSettings alloc] init];
-        appearanceSettings.tintColor = [UIColor colorWithRed:0.00 green:0.60 blue:0.60 alpha:1.00];
+        appearanceSettings.tintColor = [UIColor colorWithRed: 0.57 green: 0.37 blue: 0.92 alpha: 1.00];
         self.hb_appearanceSettings = appearanceSettings;
     }
     return self;
@@ -45,7 +45,11 @@
 
 - (void)respring {
     NSLog(@"[RF] respring called");
-    [HBRespringController respring];
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Apply Settings" message:@"Applying settings will respring your device. Are you sure?" preferredStyle:UIAlertControllerStyleAlert];
+ 
+    [alert addAction:[UIAlertAction actionWithTitle:@"Respring" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * action) {[HBRespringController respring];}]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 @end

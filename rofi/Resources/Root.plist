@@ -19,8 +19,8 @@
 			<string>#FFFFFF</string>
 		    <key>backgroundGradientColors</key>
 		    <array>
-		        <string>#009999</string>
-		        <string>#009999</string>
+		        <string>#915feb</string>
+		        <string>#915feb</string>
 		    </array>
 		</dict>
 		<dict>
@@ -42,6 +42,12 @@
 			<string>isEnabled</string>
 			<key>label</key>
 			<string>Enabled</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Shortcut view settings</string>
 		</dict>
 		<dict>
 	        <key>cell</key>
