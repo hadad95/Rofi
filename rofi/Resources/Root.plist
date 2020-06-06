@@ -19,8 +19,8 @@
 			<string>#FFFFFF</string>
 		    <key>backgroundGradientColors</key>
 		    <array>
-		        <string>#915feb</string>
-		        <string>#915feb</string>
+		        <string>#4a5899</string>
+		        <string>#4a5899</string>
 		    </array>
 		</dict>
 		<dict>
@@ -281,6 +281,8 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Credits</string>
 		</dict>
 		<dict>
 		    <key>cellClass</key>
@@ -289,6 +291,18 @@
 		    <string>Kef</string>
 		    <key>user</key>
 		    <string>theonlykef</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>label</key>
+			<string>Special Thanks</string>
+			<key>detail</key>
+			<string>RFSpecialThanksListController</string>
+			<key>defaults</key>
+			<string>com.kef.rofi</string>
+			<key>isController</key>
+			<true/>
 		</dict>
 	</array>
 	<key>title</key>

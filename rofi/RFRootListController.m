@@ -9,7 +9,7 @@
         self.navigationItem.rightBarButtonItem = respringButton;
 
         RFAppearanceSettings *appearanceSettings = [[RFAppearanceSettings alloc] init];
-        appearanceSettings.tintColor = [UIColor colorWithRed: 0.57 green: 0.37 blue: 0.92 alpha: 1.00];
+        appearanceSettings.tintColor = [UIColor colorWithRed: 0.29 green: 0.35 blue: 0.60 alpha: 1.00];
         self.hb_appearanceSettings = appearanceSettings;
     }
     return self;
