@@ -90,7 +90,7 @@ static BOOL hideWhenTakingScreenshots;
 	%orig;
 	UIView *badge = [self valueForKey:@"_accessoryView"];
 	//UIView *badge = MSHookIvar<UIView *>(self, "_accessoryView");
-	if (!viewController || !viewController.shortcutStackView || ![badge isKindOfClass:%c(SBIconView)])
+	if (!viewController || !viewController.shortcutStackView)
 		return;
 	
 	for (SBIconImageView *subview in viewController.shortcutStackView.arrangedSubviews) {
@@ -98,23 +98,27 @@ static BOOL hideWhenTakingScreenshots;
 			for (UIView *accessory in subview.subviews) {
 				[accessory removeFromSuperview];
 			}
-			if (!badge || ![badge valueForKey:@"_text"])
+			if (!badge)// || ([badge isKindOfClass:%c(SBIconView)] && ![badge valueForKey:@"_text"]))
 				return;
 			
 			NSLog(@"[RF] badge _text = %@", [badge valueForKey:@"_text"]);
 			SBIconBadgeView *temp = [[%c(SBIconBadgeView) alloc] init];
 			[temp configureForIcon:self.icon infoProvider:self];
-			temp.center = [self _centerForAccessoryView];
+			if (SYSTEM_VERSION_LESS_THAN(@"12"))
+				temp.frame = [self _frameForAccessoryView];
+			else
+				temp.center = [self _centerForAccessoryView];
 			[subview addSubview:temp];
 			return;
 		}
 	}
 }
 
+
 - (void)_destroyAccessoryView:(id)arg1 {
 	NSLog(@"[RF] _destroyAccessoryView called");
 	%orig;
-	if (!viewController || !viewController.shortcutStackView || ![arg1 isKindOfClass:%c(SBIconBadgeView)])
+	if (!viewController || !viewController.shortcutStackView)
 		return;
 	
 	for (SBIconImageView *subview in viewController.shortcutStackView.arrangedSubviews) {
@@ -125,6 +129,7 @@ static BOOL hideWhenTakingScreenshots;
 		}
 	}
 }
+
 %end
 
 %ctor {

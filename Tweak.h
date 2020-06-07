@@ -1,5 +1,7 @@
 #import "SBIconViewDelegate.h"
 
+#define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
+
 @interface SpringBoard
 - (BOOL)_handlePhysicalButtonEvent:(UIPressesEvent *)arg1;
 - (void)applicationDidFinishLaunching:(id)application;
@@ -75,11 +77,12 @@
 @property (nonatomic,readonly) UIView *labelView;
 @property(nonatomic) __weak id delegate;
 + (CGSize)defaultIconImageSize;
-- (id)initWithContentType:(NSUInteger)arg1; // ios 12
-- (id)initWithConfigurationOptions:(NSUInteger)arg1; // ios 13
+- (id)initWithContentType:(NSUInteger)arg1; // iOS 12
+- (id)initWithConfigurationOptions:(NSUInteger)arg1; // iOS 13
 - (SBIconImageView *)_iconImageView;
 - (void)_updateAccessoryViewWithAnimation:(BOOL)arg1;
-- (CGPoint)_centerForAccessoryView;
+- (CGPoint)_centerForAccessoryView; // iOS 12+
+- (CGRect)_frameForAccessoryView; // iOS 11
 - (void)_destroyAccessoryView:(id)arg1;
 @end
 
