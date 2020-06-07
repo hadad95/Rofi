@@ -90,7 +90,7 @@ static BOOL hideWhenTakingScreenshots;
 	%orig;
 	UIView *badge = [self valueForKey:@"_accessoryView"];
 	//UIView *badge = MSHookIvar<UIView *>(self, "_accessoryView");
-	if (!viewController || !viewController.shortcutStackView)
+	if (!viewController || !viewController.shortcutStackView || ![badge isKindOfClass:%c(SBIconView)])
 		return;
 	
 	for (SBIconImageView *subview in viewController.shortcutStackView.arrangedSubviews) {
