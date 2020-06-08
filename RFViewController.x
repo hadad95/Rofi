@@ -167,9 +167,16 @@ void openApplication(NSString* bundleID)
 	if (!iconView)
 		return;
 
-	CGPoint badgeCenter = [iconView _centerForAccessoryView]; // get center before adding to stack view, to avoid weird badge placement
+	// get center before adding to stack view, to avoid weird badge placement
+	CGPoint badgeCenter;
+	CGRect badgeFrame;
+	if (SYSTEM_VERSION_LESS_THAN(@"12"))
+		badgeFrame = [iconView _frameForAccessoryView];
+	else
+		badgeCenter = [iconView _centerForAccessoryView];
+	
 	UIView *imageView = [iconView _iconImageView];
-	for (UIView *subview in imageView.subviews) { // removing notification badges (iOS 13)
+	for (UIView *subview in imageView.subviews) { // removing notification badges (because iOS 13 adds them by default)
 		[subview removeFromSuperview];
 	}
 	imageView.insetsLayoutMarginsFromSafeArea = NO;
@@ -183,8 +190,10 @@ void openApplication(NSString* bundleID)
 	if (badge) {
 		[badge configureForIcon:iconView.icon infoProvider:iconView];
 		if ([badge valueForKey:@"_text"]) {
-			NSLog(@"[RF] addIconView: center = %@", NSStringFromCGPoint([iconView _centerForAccessoryView]));
-			badge.center = badgeCenter;
+			if (SYSTEM_VERSION_LESS_THAN(@"12"))
+				badge.frame = badgeFrame;
+			else
+				badge.center = badgeCenter;
 			[imageView addSubview:badge];
 		}
 	}
