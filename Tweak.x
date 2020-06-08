@@ -98,7 +98,7 @@ static BOOL hideWhenTakingScreenshots;
 			for (UIView *accessory in subview.subviews) {
 				[accessory removeFromSuperview];
 			}
-			if (!badge || ([badge isKindOfClass:%c(SBIconView)] && ![badge valueForKey:@"_text"]))
+			if (!badge || ([badge isKindOfClass:%c(SBIconBadgeView)] && ![badge valueForKey:@"_text"]))
 				return;
 			
 			NSLog(@"[RF] badge _text = %@", [badge valueForKey:@"_text"]);

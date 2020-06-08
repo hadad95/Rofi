@@ -1,7 +1,7 @@
 Package: com.kef.rofi
 Name: Rofi
 Depends: mobilesubstrate, com.spark.libsparkcolourpicker (>=0.0.26), ws.hbang.common (>= 1.11), applist
-Version: 1.1.0
+Version: 1.1.0-3
 Architecture: iphoneos-arm
 Description: An app launcher tweak.
 Maintainer: Kef
