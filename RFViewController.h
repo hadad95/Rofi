@@ -16,6 +16,7 @@
 @property (nonatomic, retain) UIPanGestureRecognizer *barEdgePan;
 @property (nonatomic, retain) UIPanGestureRecognizer *shortcutPan;
 @property (nonatomic, retain) NSArray *apps;
+- (UIView *)getIconBadgeViewForIconView:(SBIconView *)iconView;
 - (SBIconView *)getIconView:(NSString *)identifier;
 - (void)addIconView:(NSString *)identifier toStackView:(UIStackView *)stackView;
 - (void)reloadIcons;

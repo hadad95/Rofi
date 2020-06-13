@@ -136,7 +136,29 @@ void openApplication(NSString* bundleID)
     }
 }
 
-- (SBIconView*)getIconView:(NSString *)identifier {
+- (UIView *)getIconBadgeViewForIconView:(SBIconView *)iconView {
+	NSInteger badgeType;
+	if (SYSTEM_VERSION_LESS_THAN(@"13"))
+		badgeType = [((SBIcon_ios12 *)iconView.icon) accessoryTypeForLocation:1]; // iOS 12-, location 1 = home
+	else
+		badgeType = [((SBIcon_ios13 *)iconView.icon) accessoryTypeForLocation:@"SBIconLocationRoot"]; // iOS 13, location SBIconLocationRoot = home
+	
+	BOOL isContinuityBadgeView = SYSTEM_VERSION_LESS_THAN(@"13") ? !![iconView continuityAppSuggestion] : !![iconView continuityInfo]; // null check for continuity badge view
+	if (isContinuityBadgeView) {
+		SBIconContinuityBadgeView *badgeView = [[%c(SBIconContinuityBadgeView) alloc] init];
+		[badgeView configureForIcon:iconView.icon infoProvider:iconView];
+		return badgeView;
+	}
+	else if (badgeType == 1) {
+		SBIconBadgeView *badgeView = [[%c(SBIconBadgeView) alloc] init];
+		[badgeView configureForIcon:iconView.icon infoProvider:iconView];
+		return badgeView;
+	}
+	else
+		return nil;
+}
+
+- (SBIconView *)getIconView:(NSString *)identifier {
 	SBIcon *icon = [((SBIconController *)[%c(SBIconController) sharedInstance]).model expectedIconForDisplayIdentifier:identifier];
 	if (icon == nil)
 		return nil;
@@ -186,16 +208,14 @@ void openApplication(NSString* bundleID)
     [imageView.widthAnchor constraintEqualToConstant:iconWidth].active = true;
     [imageView.heightAnchor constraintEqualToConstant:iconHeight].active = true;
 	// adding notification badge
-	SBIconBadgeView *badge = [[%c(SBIconBadgeView) alloc] init];
+	UIView *badge = [self getIconBadgeViewForIconView:iconView];
 	if (badge) {
-		[badge configureForIcon:iconView.icon infoProvider:iconView];
-		if ([badge valueForKey:@"_text"]) {
-			if (SYSTEM_VERSION_LESS_THAN(@"12"))
-				badge.frame = badgeFrame;
-			else
-				badge.center = badgeCenter;
-			[imageView addSubview:badge];
-		}
+		if (SYSTEM_VERSION_LESS_THAN(@"12"))
+			badge.frame = badgeFrame;
+		else
+			badge.center = badgeCenter;
+		
+		[imageView addSubview:badge];
 	}
 
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(iconTapped:)];

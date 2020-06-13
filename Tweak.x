@@ -88,7 +88,6 @@ static BOOL hideWhenTakingScreenshots;
 %hook SBIconView
 - (void)_updateAccessoryViewWithAnimation:(BOOL)arg1 {
 	%orig;
-	UIView *badge = [self valueForKey:@"_accessoryView"];
 	//UIView *badge = MSHookIvar<UIView *>(self, "_accessoryView");
 	if (!viewController || !viewController.shortcutStackView)
 		return;
@@ -98,17 +97,14 @@ static BOOL hideWhenTakingScreenshots;
 			for (UIView *accessory in subview.subviews) {
 				[accessory removeFromSuperview];
 			}
-			if (!badge || ([badge isKindOfClass:%c(SBIconBadgeView)] && ![badge valueForKey:@"_text"]))
-				return;
 			
-			NSLog(@"[RF] badge _text = %@", [badge valueForKey:@"_text"]);
-			SBIconBadgeView *temp = [[%c(SBIconBadgeView) alloc] init];
-			[temp configureForIcon:self.icon infoProvider:self];
+			UIView *badge = [viewController getIconBadgeViewForIconView:self];
 			if (SYSTEM_VERSION_LESS_THAN(@"12"))
-				temp.frame = [self _frameForAccessoryView];
+				badge.frame = [self _frameForAccessoryView];
 			else
-				temp.center = [self _centerForAccessoryView];
-			[subview addSubview:temp];
+				badge.center = [self _centerForAccessoryView];
+			
+			[subview addSubview:badge];
 			return;
 		}
 	}

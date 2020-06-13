@@ -50,12 +50,19 @@
 - (BOOL)_canShowWhileLocked;
 @end
 
-@interface SBIcon
+@interface SBIcon : NSObject
 - (id)applicationBundleID;
-- (void)setBadge:(UIView *)arg1;
 @end
 
-@interface SBIconModel
+@interface SBIcon_ios13 : SBIcon
+- (long long)accessoryTypeForLocation:(id)arg1; // iOS 13 only
+@end
+
+@interface SBIcon_ios12 : SBIcon
+- (long long)accessoryTypeForLocation:(long long)arg1; // iOS 12 only
+@end
+
+@interface SBIconModel : NSObject
 - (id)expectedIconForDisplayIdentifier:(id)arg1;
 @end
 
@@ -72,6 +79,10 @@
 - (void)configureForIcon:(id)arg1 infoProvider:(id)arg2;
 @end
 
+@interface SBIconContinuityBadgeView : UIView
+- (void)configureForIcon:(id)arg1 infoProvider:(id)arg2;
+@end
+
 @interface SBIconView : UIView
 @property(retain, nonatomic) SBIcon *icon;
 @property (nonatomic,readonly) UIView *labelView;
@@ -84,6 +95,8 @@
 - (CGPoint)_centerForAccessoryView; // iOS 12+
 - (CGRect)_frameForAccessoryView; // iOS 11
 - (void)_destroyAccessoryView:(id)arg1;
+- (id)continuityAppSuggestion; // iOS 11 and 12
+- (id)continuityInfo; // iOS 13
 @end
 
 @interface UIApplication (Private)
