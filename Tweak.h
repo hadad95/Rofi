@@ -2,6 +2,10 @@
 
 #define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 
+@interface NSObject (Private)
+- (id)safeValueForKey:(NSString *)key;
+@end
+
 @interface SpringBoard
 - (BOOL)_handlePhysicalButtonEvent:(UIPressesEvent *)arg1;
 - (void)applicationDidFinishLaunching:(id)application;

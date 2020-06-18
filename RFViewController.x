@@ -152,7 +152,10 @@ void openApplication(NSString* bundleID)
 	else if (badgeType == 1) {
 		SBIconBadgeView *badgeView = [[%c(SBIconBadgeView) alloc] init];
 		[badgeView configureForIcon:iconView.icon infoProvider:iconView];
-		return badgeView;
+		if ([badgeView safeValueForKey:@"_text"])
+			return badgeView;
+		else
+			return nil;
 	}
 	else
 		return nil;

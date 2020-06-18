@@ -99,6 +99,9 @@ static BOOL hideWhenTakingScreenshots;
 			}
 			
 			UIView *badge = [viewController getIconBadgeViewForIconView:self];
+			if (!badge)
+				return;
+			
 			if (SYSTEM_VERSION_LESS_THAN(@"12"))
 				badge.frame = [self _frameForAccessoryView];
 			else
