@@ -1,6 +1,6 @@
 #import "RFViewController.h"
 #import <Cephei/HBPreferences.h>
-#import "SparkColourPickerUtils.h"
+#import "libcolorpicker.h"
 #import <notify.h>
 
 NSLayoutConstraint *barViewCenterXConstraint;
@@ -24,6 +24,8 @@ NSString *barColor;
 BOOL isTimeoutEnabled;
 NSInteger timeoutDelay;
 BOOL isBlurEnabled;
+BOOL isCenteredWithBarPosition;
+BOOL isBadgesEnabled;
 
 void openApplication(NSString* bundleID)
 {
@@ -55,9 +57,11 @@ void openApplication(NSString* bundleID)
 		numberOfIcons = [prefs integerForKey:@"numberOfIcons" default:4];
 		isRightDirection = [prefs boolForKey:@"isRightDirection" default:NO];
 		barViewCenterYPosition = [prefs floatForKey:@"barViewCenterYPosition" default:UIScreen.mainScreen.bounds.size.height/2];
+		isBadgesEnabled = [prefs boolForKey:@"isBadgesEnabled" default:YES];
 		//numberOfIcons = apps.count;
 
 		//[prefs registerInteger:&numberOfIcons default:4 forKey:@"numberOfIcons"];
+		[prefs registerBool:&isCenteredWithBarPosition default:YES forKey:@"isCenteredWithBarPosition"];
 		[prefs registerBool:&isBlurEnabled default:YES forKey:@"isBlurEnabled"];
 		[prefs registerBool:&isBarMovable default:YES forKey:@"isBarMovable"];
 		[prefs registerFloat:&barWidth default:10.0 forKey:@"barWidth"];
@@ -68,15 +72,8 @@ void openApplication(NSString* bundleID)
 		[prefs registerInteger:&timeoutDelay default:15 forKey:@"timeoutDelay"];
 		[prefs registerPreferenceChangeBlock:^ {
 			NSLog(@"[RF] registerPreferenceChangeBlock called");
-			CGPoint center;
-			CGRect bounds = UIScreen.mainScreen.bounds;
-			if (isRightDirection) {
-				center = CGPointMake(bounds.size.width - barWidth/2, barViewCenterYPosition);
-			}
-			else {
-				center = CGPointMake(barWidth/2, barViewCenterYPosition);
-			}
-			UIColor *color = [SparkColourPickerUtils colourWithString:barColor withFallback:@"#99AAB5"];
+			self.shortcutView.center = CGPointMake(self.shortcutView.center.x, [self shortcutViewCenterYPositionWithHeight:self.shortcutView.frame.size.height]);
+			UIColor *color = LCPParseColorString(barColor, @"#99AAB5");
 			//NSLog(@"[RF] user defaults result = %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"barColor" inDomain:@"com.kef.rofi"]);
 			//NSLog(@"[RF] barColor = %@, color = %@", barColor, color);
 			[self.view layoutIfNeeded];
@@ -137,6 +134,9 @@ void openApplication(NSString* bundleID)
 }
 
 - (UIView *)getIconBadgeViewForIconView:(SBIconView *)iconView {
+	if (!isBadgesEnabled)
+		return nil;
+	
 	NSInteger badgeType;
 	if (SYSTEM_VERSION_LESS_THAN(@"13"))
 		badgeType = [((SBIcon_ios12 *)iconView.icon) accessoryTypeForLocation:1]; // iOS 12-, location 1 = home
@@ -228,7 +228,9 @@ void openApplication(NSString* bundleID)
 
 - (CGFloat)shortcutViewCenterYPositionWithHeight:(CGFloat)shortcutViewHeight {
 	CGRect bounds = UIScreen.mainScreen.bounds;
-	if (barViewCenterYPosition + (shortcutViewHeight / 2) > bounds.size.height)
+	if (!isCenteredWithBarPosition)
+		return bounds.size.height / 2;
+	else if (barViewCenterYPosition + (shortcutViewHeight / 2) > bounds.size.height)
 		return bounds.size.height - shortcutViewHeight / 2;
 	else if (barViewCenterYPosition - (shortcutViewHeight / 2) < 0)
 		return shortcutViewHeight / 2;
@@ -305,7 +307,7 @@ void openApplication(NSString* bundleID)
 
     [self reloadIcons];
 
-    UIColor *color = [SparkColourPickerUtils colourWithString:barColor withFallback:@"#99AAB5"];
+    UIColor *color = LCPParseColorString(barColor, @"#99AAB5");
     self.barView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
     self.barView.backgroundColor = [color colorWithAlphaComponent:barAlpha];
 	self.barView.translatesAutoresizingMaskIntoConstraints = false;
@@ -370,7 +372,7 @@ void openApplication(NSString* bundleID)
 
     		[self showViewWithPropertyAnimator:panAnimator isHiding:YES];
     	}
-		//panAnimator = nil; // prevent a possible retain cycle
+		panAnimator = nil; // prevent a possible retain cycle
     }
 }
 
@@ -605,6 +607,9 @@ void openApplication(NSString* bundleID)
 }
 
 - (void)blurViewTapped:(id)arg1 {
+	if (panAnimator && panAnimator.state != UIViewAnimatingStateStopped)
+		return;
+	
 	[self hideView];
 }
 

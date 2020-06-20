@@ -9,7 +9,7 @@ Rofi_FILES = $(wildcard *.m)
 Rofi_INSTALL_PATH = /Library/PreferenceBundles
 Rofi_FRAMEWORKS = UIKit
 Rofi_PRIVATE_FRAMEWORKS = Preferences
-Rofi_LIBRARIES = sparkcolourpicker applist
+Rofi_LIBRARIES = colorpicker applist
 Rofi_EXTRA_FRAMEWORKS += Cephei CepheiPrefs
 Rofi_CFLAGS = -fobjc-arc
 

@@ -8,7 +8,7 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = Rofi
 
 Rofi_FILES = Tweak.x RFViewController.x RFView.m
-Rofi_LIBRARIES = sparkcolourpicker
+Rofi_LIBRARIES = colorpicker
 Rofi_CFLAGS = -fobjc-arc
 Rofi_EXTRA_FRAMEWORKS = Cephei
 
