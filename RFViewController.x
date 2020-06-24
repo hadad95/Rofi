@@ -129,7 +129,6 @@ void openApplication(NSString* bundleID)
 	}
 	for (NSString *app in self.apps) {
     	[self addIconView:app toStackView:self.shortcutStackView];
-    	NSLog(@"[RF] icon frame = %@", NSStringFromCGRect(self.shortcutStackView.arrangedSubviews[0].frame));
     }
 }
 
