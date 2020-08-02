@@ -1,7 +1,7 @@
 Package: com.kef.rofi
 Name: Rofi
 Depends: mobilesubstrate, ws.hbang.alderis, ws.hbang.common (>= 1.11), applist
-Version: 1.2
+Version: 1.2.0-1
 Architecture: iphoneos-arm
 Description: An app launcher tweak.
 Maintainer: Kef

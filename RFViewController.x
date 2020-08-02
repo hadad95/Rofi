@@ -371,7 +371,6 @@ void openApplication(NSString* bundleID)
 
     		[self showViewWithPropertyAnimator:panAnimator isHiding:YES];
     	}
-		panAnimator = nil; // prevent a possible retain cycle
     }
 }
 
@@ -402,7 +401,6 @@ void openApplication(NSString* bundleID)
 
     		[self hideViewWithPropertyAnimator:panAnimator isHiding:NO];
     	}
-		panAnimator = nil; // prevent a possible retain cycle
     }
 }
 
